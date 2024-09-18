@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Left 4 Dead 2 Mod Browser</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Left 4 Dead 2 Mod Browser</h1>
+      <div id="nav-container">
+        <div id="search-container">
+          <input type="text" id="search-input" placeholder="Search mods..." />
+          <select id="tag-select">
+            <option value="">All Tags</option>
+          </select>
+        </div>
+        <button id="toggle-view">Create Modpack</button>
+      </div>
+      <div id="mod-browser" class="view active">
+        <div id="mod-list"></div>
+      </div>
+      <div id="modpack-creator" class="view">
+        <h2>Create Modpack</h2>
+        <div id="modpack-progress"></div>
+        <div id="modpack-slots"></div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
