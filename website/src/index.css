@@ -1,0 +1,220 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+.app {
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.app-header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.app-header nav button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin-left: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.app-header nav button:hover {
+  background-color: #2980b9;
+}
+
+.search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-container input,
+.search-container select {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.size-filter {
+  display: flex;
+  gap: 10px;
+}
+
+.size-filter input {
+  width: 120px;
+}
+
+.mod-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  /* width: 90% !important; */
+}
+
+.mod-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mod-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.mod-card p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #34495e;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.add-to-modpack {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.add-to-modpack:hover {
+  background-color: #27ae60;
+}
+
+#modpack-creator {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#modpack-list {
+  margin-bottom: 20px;
+}
+
+.modpack-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.modpack-item button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modpack-item button:hover {
+  background-color: #c0392b;
+}
+
+#modpack-stats {
+  background-color: #ecf0f1;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+.popup-content {
+  position: absolute;
+  background-color: grey;
+  top: 10%;
+  left: 25%;
+  width: 50%;
+  border: 3px black solid;
+  padding: 10px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1%;
+}
+
+/** ModpackCreator.js styles **/
+#tag-stats {
+  margin-top: 20px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#tag-stats h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.tag-category {
+  margin-bottom: 15px;
+}
+
+.tag-category h4 {
+  color: #34495e;
+  margin-bottom: 5px;
+}
+
+.tag-count {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.missing-tag {
+  color: #e74c3c;
+  font-weight: bold;
+}
