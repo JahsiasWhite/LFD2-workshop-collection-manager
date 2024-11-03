@@ -49,18 +49,17 @@
 }
 
 .remove-button {
-  background-color: #ef4444;
+  background-color: #e74c3c;
   color: white;
   border: none;
-  border-radius: 9999px;
-  padding: 4px 12px;
-  font-size: 0.875rem;
+  /* padding: 5px 10px; */
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 .remove-button:hover {
-  background-color: #dc2626;
+  background-color: #c0392b;
 }
 
 .modpack-stats {
@@ -129,7 +128,7 @@
 }
 
 .tag-image {
-  width: 40%;
+  width: 100%;
   /* height: 100%;
   object-fit: cover; */
 }

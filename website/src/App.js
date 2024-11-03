@@ -4,6 +4,7 @@ import { FixedSizeList as List } from 'react-window';
 import ModpackCreator from './ModpackCreator';
 import AddToModpack from './AddToModpack';
 import ImportCollection from './ImportCollection';
+import LazyImage from './LazyImage';
 
 const allTags = [
   {
@@ -395,26 +396,36 @@ const App = () => {
     const mod = filteredMods[index];
     return (
       <div className="mod-card" style={style}>
-        <h3>{mod.title}</h3>
-        <p>Subscriptions: {mod.subscriptions}</p>
-        <p>File Size: {(mod.file_size / 1024 / 1024).toFixed(2)} MB</p>
-        <div>
-          {mod.tags.map((tag) => (
-            <span key={tag} className="tag">
-              {tag}
-            </span>
-          ))}
+        {/* <img className="mod-card-img" src={mod.preview_url} alt={mod.title} />
+         */}
+        <LazyImage
+          src={mod.preview_url}
+          alt={mod.title}
+          className="mod-card-img"
+        />
+
+        <div style={{ marginLeft: '10px' }}>
+          <h3>{mod.title}</h3>
+          <p>Subscriptions: {mod.subscriptions}</p>
+          <p>File Size: {(mod.file_size / 1024 / 1024).toFixed(2)} MB</p>
+          <div>
+            {mod.tags.map((tag) => (
+              <span key={tag} className="tag">
+                {tag}
+              </span>
+            ))}
+          </div>
+          <a href={mod.url} target="_blank" rel="noopener noreferrer">
+            View on Steam
+          </a>
+          <button
+            className="add-to-modpack"
+            data-mod-id={mod.id}
+            onClick={() => handleAddToModpackClick(mod)}
+          >
+            Add to Modpack
+          </button>
         </div>
-        <a href={mod.url} target="_blank" rel="noopener noreferrer">
-          View on Steam
-        </a>
-        <button
-          className="add-to-modpack"
-          data-mod-id={mod.id}
-          onClick={() => handleAddToModpackClick(mod)}
-        >
-          Add to Modpack
-        </button>
       </div>
     );
   };
@@ -535,6 +546,18 @@ const App = () => {
             'browser'
           ) : (
             <>
+              <button
+                onClick={() => {
+                  if (
+                    window.confirm('Are you sure you want to remove all mods?')
+                  ) {
+                    setModpack([]);
+                  }
+                }}
+                className="remove-button"
+              >
+                Remove All Mods
+              </button>
               <button onClick={() => setShowImportPopup(true)}>
                 Import Collection
               </button>
@@ -556,7 +579,7 @@ const App = () => {
           <List
             height={900}
             itemCount={filteredMods.length}
-            itemSize={200}
+            itemSize={230}
             width="100%"
             style={{ overflowX: 'hidden', borderRadius: '8px' }}
           >

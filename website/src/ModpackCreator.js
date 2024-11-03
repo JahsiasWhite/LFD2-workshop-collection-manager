@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useMemo } from 'react';
 
 import './ModpackCreator.css';
+import LazyImage from './LazyImage';
+
+import TagCard from './TagCard';
 
 const allTags = [
   {
@@ -286,44 +289,6 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack }) => {
     setUntaggedMods(untagged);
   }, [modpack]);
 
-  const TagCard = ({ tag, count, category }) => {
-    const hasTag = count > 0;
-    const isExpanded = expandedCard === tag;
-    const backgroundImage = `/logo192.png`;
-
-    return (
-      <div
-        className={`tag-card ${hasTag ? 'has-tag' : 'missing-tag'} ${
-          isExpanded ? 'expanded' : ''
-        }`}
-        onClick={() => handleCardClick(tag)}
-      >
-        <div className="tag-card-content">
-          <img src={backgroundImage} alt={tag} className="tag-image" />
-          <div className="tag-info">
-            <h4>{tag}</h4>
-            <p className={`status ${hasTag ? 'added' : 'missing'}`}>
-              {hasTag ? 'Added' : 'Missing'}
-            </p>
-            <p className="count">Count: {count}</p>
-          </div>
-        </div>
-        {hasTag && (
-          <div className="tag-card-details">
-            <h5>Mods with this tag:</h5>
-            <ul>
-              {modpack
-                .filter((mod) => mod.tags.includes(tag))
-                .map((mod) => (
-                  <li key={mod.id}>{mod.title}</li>
-                ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   const toggleModpackList = () => {
     setIsModpackListOpen(!isModpackListOpen);
   };
@@ -432,6 +397,9 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack }) => {
                   tag={tag}
                   count={tagCounts[tag] || 0}
                   category={category.category}
+                  modpack={modpack}
+                  onCardClick={handleCardClick}
+                  isExpanded={expandedCard === tag}
                 />
               ))}
             </div>
