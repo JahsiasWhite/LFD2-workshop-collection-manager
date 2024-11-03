@@ -69,6 +69,186 @@ const allTags = [
   },
 ];
 
+const customTags = [
+  {
+    category: 'Survivors',
+    tags: [
+      'Bill',
+      'Francis',
+      'Zoey',
+      'Louis',
+      'Coach',
+      'Ellis',
+      'Nick',
+      'Rochelle',
+    ],
+  },
+  {
+    category: 'Infected',
+    tags: [
+      'Common Infected',
+      'Riot Infected',
+      'Mud Men',
+      'Clown Infected',
+      'CEDA Worker Infected',
+      'Road Crew',
+      'Fallen Survivor',
+    ],
+  },
+  {
+    category: 'Special Infected',
+    tags: [
+      'Hunter',
+      'Smoker',
+      'Boomer',
+      'Jockey',
+      'Spitter',
+      'Charger',
+      'Witch',
+      'Tank',
+    ],
+  },
+  {
+    category: 'Melee Weapons',
+    tags: [
+      'Axe',
+      'Baseball Bat',
+      'Chainsaw',
+      'Cricket Bat',
+      'Crowbar',
+      'Frying Pan',
+      'Golf Club',
+      'Guitar',
+      'Katana',
+      'Machete',
+      'Tonfa',
+      'Shovel',
+      'Pitchfork',
+      'Combat Knife',
+    ],
+  },
+  {
+    category: 'Handguns',
+    tags: ['P220 Pistol', 'Glock 17', 'Magnum'],
+  },
+  {
+    category: 'SMGs',
+    tags: [
+      'Submachine Gun (UZI)',
+      'Silenced Submachine Gun (Mac-10)',
+      'H&K MP5 (CS:S)',
+    ],
+  },
+  {
+    category: 'Assault Rifles',
+    tags: ['M-16', 'Combat Rifle', 'AK-47', 'SIG SG552'],
+  },
+  {
+    category: 'Shotguns',
+    tags: [
+      'Pump Shotgun',
+      'Chrome Shotgun',
+      'Tactical Shotgun',
+      'Combat Shotgun',
+    ],
+  },
+  {
+    category: 'Snipers',
+    tags: ['Hunting Rifle', 'Military Rifle', 'Scout Rifle', 'AWP'],
+  },
+  {
+    category: 'Heavys',
+    tags: ['Grenade Launcher', 'M60', 'Mounted M60'],
+  },
+  {
+    category: 'Throwables',
+    tags: ['Molotov', 'Pipe Bomb', 'Boomer Bile'],
+  },
+  {
+    category: 'Weapon Upgrades',
+    tags: ['Laser Sight', 'Incendiary Ammo', 'Explosive Ammo'],
+  },
+  {
+    category: 'Usable Items',
+    tags: [
+      'Gas Can',
+      'Oxygen Tank',
+      'Fireworks',
+      'Explosive Barrel',
+      'Ammo Pile',
+    ],
+  },
+  {
+    category: 'Special Items',
+    tags: ['Cola', 'Gnome Chompski', 'Scavenge Gas Cans'],
+  },
+  {
+    category: 'Medical',
+    tags: ['Medkit', 'Defibrillator', 'Pills', 'Adrenaline'],
+  },
+  {
+    category: 'Animations',
+    tags: ['Healing', 'Reviving'],
+  },
+  {
+    category: 'Sounds',
+    tags: [
+      'Jukebox',
+      'Horde Incoming',
+      'Fall Sounds',
+      'Radial Character Voices',
+    ],
+  },
+  {
+    category: 'Music',
+    tags: [
+      'Concert Music',
+      'Saferoom Music',
+      'End Music',
+      'Death Music',
+      'Main Menu Music',
+      'Elevator Music',
+      'Tank Fight Music',
+    ],
+  },
+  {
+    category: 'Extras',
+    tags: [
+      'Particles',
+      'Graffiti',
+      'Flash Light',
+      'Moon',
+      'Helicopter',
+      'Jet',
+      'Blood',
+      'Car',
+      'Fire',
+      'Medical Cabinet',
+      'HUD',
+      'Main Menu Background',
+      'Saferoom Door',
+      'Grenade Launcher Grenade',
+      'Skybox',
+      'Billboards',
+      'Posters',
+      'Tank Rock',
+      'Pizza Boxes',
+      'Jimmys Car',
+      'TV',
+      'Ladders',
+      'Generators',
+      'Benches',
+      'Barriers',
+      'Tables',
+      'Flags',
+      'Potted Plant',
+      'Foliage',
+      'Water',
+      'Fence',
+    ],
+  },
+];
+
 const App = () => {
   const [mods, setMods] = useState([]);
   const [filteredMods, setFilteredMods] = useState([]);
@@ -144,8 +324,6 @@ const App = () => {
   };
 
   const filterAndSortMods = useCallback(() => {
-    let allWorkshopTags = {};
-
     let result = mods.filter((mod) => {
       const titleMatch = mod.title
         .toLowerCase()
@@ -165,17 +343,8 @@ const App = () => {
       //   categoryMatch = mod.tags.length <= 8;
       // }
 
-      // TODO REMOVE
-      // TESTING - TOTAL NUM OF TAGS ON WORKSHOP AND WHAT THEY ARE
-      mod.tags.forEach((tag) => {
-        if (!allWorkshopTags[tag]) {
-          allWorkshopTags[tag] = tag;
-        }
-      });
-
       return titleMatch && tagMatch && sizeMatch && categoryMatch;
     });
-    console.error(allWorkshopTags, Object.keys(allWorkshopTags).length);
 
     switch (sortBy) {
       case 'subscriptionsDesc':
@@ -277,7 +446,8 @@ const App = () => {
         if (!updatedModpack.some((m) => m.id === mod.id)) {
           // if (mod.addedTags === undefined) mod.addedTags = [];
           mod.addedTags = mod.tags;
-          console.error('MOD: ', mod);
+          addCustomTags(mod);
+
           updatedModpack.push(mod);
         }
       });
@@ -290,57 +460,93 @@ const App = () => {
     filterAndSortMods();
   };
 
+  const addCustomTags = (mod) => {
+    customTags.forEach((category) => {
+      category.tags.forEach((tag) => {
+        // Convert both the tag and the mod title to lowercase for case-insensitive matching
+        if (
+          mod.title.toLowerCase().includes(tag.toLowerCase()) ||
+          (tag === 'Fence' && mod.title.toLowerCase().includes('Fenc'))
+        ) {
+          // Check if the tag is already in addedTags to avoid duplicates
+          if (!mod.addedTags.includes(tag)) {
+            mod.addedTags.push(tag);
+          }
+        }
+      });
+    });
+  };
+
   return (
     <div className="app">
+      <header className="app-header">
+        <h1>Left 4 Dead 2 Mod Browser</h1>
+        <p className="header-desc">Find and organize your favorite mods</p>
+      </header>
+
       <div className="nav-container">
-        <div className="search-container">
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Search mods..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <select
-            id="tag-select"
-            value={selectedTag}
-            onChange={(e) => updateSelectedTag(e.target)}
-          >
-            <option value="">All Tags</option>
-            {allTags.map((category) => (
-              <optgroup key={category.category} label={category.category}>
-                {category.tags.map((tag) => (
-                  <option
-                    key={tag}
-                    value={tag}
-                    data-category={category.category}
-                  >
-                    {tag}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-          <select
-            id="sort-select"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="subscriptionsDesc">Most Subscriptions</option>
-            <option value="subscriptionsAsc">Least Subscriptions</option>
-            <option value="titleAsc">Title A-Z</option>
-            <option value="titleDesc">Title Z-A</option>
-            <option value="fileSize">File Size</option>
-          </select>
-        </div>
+        {view === 'modpack' ? (
+          'modpack'
+        ) : (
+          <div className="search-container">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search mods..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <select
+              id="tag-select"
+              value={selectedTag}
+              onChange={(e) => updateSelectedTag(e.target)}
+            >
+              <option value="">All Tags</option>
+              {allTags.map((category) => (
+                <optgroup key={category.category} label={category.category}>
+                  {category.tags.map((tag) => (
+                    <option
+                      key={tag}
+                      value={tag}
+                      data-category={category.category}
+                    >
+                      {tag}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+            <select
+              id="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="subscriptionsDesc">Most Subscriptions</option>
+              <option value="subscriptionsAsc">Least Subscriptions</option>
+              <option value="titleAsc">Title A-Z</option>
+              <option value="titleDesc">Title Z-A</option>
+              <option value="fileSize">File Size</option>
+            </select>
+          </div>
+        )}
+
         <nav>
-          <button onClick={() => setShowImportPopup(true)}>
-            Import Collection
-          </button>
+          {view === 'browser' ? (
+            'browser'
+          ) : (
+            <>
+              <button onClick={() => setShowImportPopup(true)}>
+                Import Collection
+              </button>
+              <button onClick={() => setShowImportPopup(true)}>
+                Export Collection
+              </button>
+            </>
+          )}
           <button
             onClick={() => setView(view === 'browser' ? 'modpack' : 'browser')}
           >
-            {view === 'browser' ? 'Create Modpack' : 'Browse Mods'}
+            {view === 'browser' ? 'Manage Modpack' : 'Browse Mods'}
           </button>
         </nav>
       </div>
@@ -352,13 +558,14 @@ const App = () => {
             itemCount={filteredMods.length}
             itemSize={200}
             width="100%"
-            overflow="none"
+            style={{ overflowX: 'hidden', borderRadius: '8px' }}
           >
             {ModCard}
           </List>
         </div>
       ) : (
         <ModpackCreator
+          mods={mods}
           modpack={modpack}
           removeFromModpack={removeFromModpack}
           allTags={allTags}
@@ -379,6 +586,8 @@ const App = () => {
           onClose={() => setShowImportPopup(false)}
         />
       )}
+
+      <div className="footer"></div>
     </div>
   );
 };

@@ -3,7 +3,20 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background-color: black;
+  /* background-color: #f4f4f4; */
+}
+
+.footer {
+  background-image: url(../public/footer_img.jpg);
+  background-repeat: no-repeat;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  height: 353px;
+  background-position: center top;
+  z-index: -1;
 }
 
 .app {
@@ -13,10 +26,10 @@ body {
 }
 
 .app-header {
-  background-color: #2c3e50;
+  /* background-color: #2c3e50; */
   color: white;
   padding: 20px;
-  display: flex;
+  /* display: flex; */
   justify-content: space-between;
   align-items: center;
   border-radius: 8px;
@@ -29,7 +42,7 @@ body {
   font-size: 24px;
 }
 
-.app-header nav button {
+button {
   background-color: #3498db;
   color: white;
   border: none;
@@ -40,8 +53,12 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.app-header nav button:hover {
+button:hover {
   background-color: #2980b9;
+}
+
+.header-desc {
+  margin: 0;
 }
 
 .search-container {
@@ -122,8 +139,11 @@ body {
 #modpack-creator {
   background-color: white;
   border-radius: 8px;
-  padding: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden auto;
+  height: 900px;
 }
 
 #modpack-list {
@@ -183,6 +203,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1%;
+  height: 5vh;
 }
 
 /** ModpackCreator.js styles **/
@@ -217,4 +238,8 @@ body {
 .missing-tag {
   color: #e74c3c;
   font-weight: bold;
+}
+
+.popup-buttons {
+  margin-top: 1%;
 }

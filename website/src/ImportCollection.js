@@ -53,7 +53,7 @@ const ImportCollection = ({ onImport, onClose }) => {
             />
           </div> */}
           <div>
-            <label htmlFor="collectionId">Collection ID:</label>
+            <label htmlFor="collectionId">Collection ID: </label>
             <input
               type="text"
               id="collectionId"
