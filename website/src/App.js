@@ -325,6 +325,8 @@ const App = () => {
   };
 
   const filterAndSortMods = useCallback(() => {
+    console.error(selectedTag);
+
     let result = mods.filter((mod) => {
       const titleMatch = mod.title
         .toLowerCase()
@@ -488,6 +490,25 @@ const App = () => {
     });
   };
 
+  const handleTagSearch = (search) => {
+    setSearchTerm(search);
+
+    // Find the category that contains the searched tag
+    const foundCategory = customTags.find((categoryObj) =>
+      categoryObj.tags.includes(search)
+    );
+    console.error(foundCategory, foundCategory.category);
+    if (foundCategory.category === 'Survivors') {
+      setSelectedTag(search);
+    } else if (foundCategory.category === 'Extras') {
+      setSelectedTag('Miscellaneous');
+    } else {
+      setSelectedTag('');
+    }
+
+    setView('browser');
+  };
+
   return (
     <div className="app">
       <header className="app-header">
@@ -497,7 +518,7 @@ const App = () => {
 
       <div className="nav-container">
         {view === 'modpack' ? (
-          'modpack'
+          <div></div>
         ) : (
           <div className="search-container">
             <input
@@ -591,6 +612,7 @@ const App = () => {
           mods={mods}
           modpack={modpack}
           removeFromModpack={removeFromModpack}
+          onTagSearch={handleTagSearch}
           allTags={allTags}
         />
       )}

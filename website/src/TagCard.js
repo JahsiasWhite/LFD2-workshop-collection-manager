@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo, useMemo } from 'react';
 import LazyImage from './LazyImage';
 
 const TagCard = memo(
-  ({ tag, count, category, modpack, onCardClick, isExpanded }) => {
+  ({ tag, count, category, modpack, onCardClick, isExpanded, onTagSearch }) => {
     const hasTag = count > 0;
     // const isExpanded = expandedCard === tag;
     const backgroundImage = `/logo192.png`;
@@ -20,12 +20,21 @@ const TagCard = memo(
       return modWithImage?.preview_url || null;
     }, [modsWithTag]);
 
+    const handleClick = (e) => {
+      e.preventDefault();
+      if (!hasTag) {
+        onTagSearch(tag);
+      } else {
+        onCardClick(tag);
+      }
+    };
+
     return (
       <div
         className={`tag-card ${hasTag ? 'has-tag' : 'missing-tag'} ${
           isExpanded ? 'expanded' : ''
         }`}
-        onClick={() => onCardClick(tag)}
+        onClick={handleClick}
       >
         <div className="tag-card-content">
           {previewImage && (

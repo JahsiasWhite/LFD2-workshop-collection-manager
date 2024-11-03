@@ -7,6 +7,17 @@ body {
   /* background-color: #f4f4f4; */
 
   --white: #f2f3f4;
+  --blue: #3b82f6; /* 008dd5 */
+
+  --background-color: black;
+}
+
+a {
+  color: var(--blue);
+}
+
+a:visited {
+  color: #9883e5;
 }
 
 .footer {
@@ -45,7 +56,7 @@ body {
 }
 
 button {
-  background-color: #3498db;
+  background-color: var(--blue);
   color: var(--white);
   border: none;
   padding: 10px 15px;
@@ -89,9 +100,9 @@ button:hover {
 }
 
 .mod-card {
-  background-color: black;
+  background-color: #0a0a0a;
   /* color: #9e0031; */
-  color: white;
+  color: var(--white);
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -131,7 +142,7 @@ button:hover {
 }
 
 .add-to-modpack {
-  background-color: #2ecc71;
+  background-color: #386150;
   color: white;
   border: none;
   padding: 8px 12px;
@@ -146,7 +157,8 @@ button:hover {
 }
 
 #modpack-creator {
-  background-color: white;
+  background-color: #0a0a0a;
+  color: var(--white);
   border-radius: 8px;
   padding-left: 20px;
   padding-right: 20px;
@@ -163,7 +175,7 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #f9f9f9;
+  background-color: black;
   padding: 10px;
   border-radius: 4px;
   margin-bottom: 10px;
@@ -184,7 +196,7 @@ button:hover {
 } */
 
 #modpack-stats {
-  background-color: #ecf0f1;
+  background-color: black;
   padding: 10px;
   border-radius: 4px;
 }
@@ -247,6 +259,10 @@ button:hover {
 .missing-tag {
   color: #e74c3c;
   font-weight: bold;
+}
+
+.has-tag {
+  color: black;
 }
 
 .popup-buttons {

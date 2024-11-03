@@ -213,7 +213,7 @@ const tagVariations = {
   // Pills: ['Pain Pills', 'Pain Killers'],
 };
 
-const ModpackCreator = ({ mods, modpack, removeFromModpack }) => {
+const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
   const [tagCounts, setTagCounts] = useState({});
   const [isModpackListOpen, setIsModpackListOpen] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
@@ -400,6 +400,7 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack }) => {
                   modpack={modpack}
                   onCardClick={handleCardClick}
                   isExpanded={expandedCard === tag}
+                  onTagSearch={onTagSearch}
                 />
               ))}
             </div>

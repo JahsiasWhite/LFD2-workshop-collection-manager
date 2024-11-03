@@ -39,7 +39,7 @@ const AddToModpack = ({ mod, onClose, onAdd, allTags }) => {
     <div className="add-to-modpack-popup">
       <div className="popup-content">
         <h2>Add {mod.title} to Modpack</h2>
-        <p>Choose a slot:</p>
+        <p>Choose a slot</p>
         <form onSubmit={handleSubmit}>
           <div>
             <h3>Compatible Slots:</h3>
