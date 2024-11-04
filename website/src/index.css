@@ -295,6 +295,9 @@ button:hover {
 
 .popup-buttons {
   margin-top: 2%;
+
+  display: flex;
+  gap: 1px;
 }
 
 .import-button {
@@ -311,13 +314,14 @@ button:hover {
 
 .modpack-slot-header {
   background-color: var(--background-color);
-  position: fixed;
+  position: sticky;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 50%;
+  /* width: 50%; */
 }
 
-.choose-slot {
+/* .choose-slot {
   margin-top: 6vh;
-}
+} */
