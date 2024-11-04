@@ -4,6 +4,7 @@ import { FixedSizeList as List } from 'react-window';
 import ModpackCreator from './ModpackCreator';
 import AddToModpack from './AddToModpack';
 import ImportCollection from './ImportCollection';
+import ExportCollection from './ExportCollection';
 import LazyImage from './LazyImage';
 
 const allTags = [
@@ -260,9 +261,15 @@ const App = () => {
   const [view, setView] = useState('browser');
   const [modpack, setModpack] = useState([]);
   const [sizeFilter, setSizeFilter] = useState({ min: 0, max: Infinity });
+
   const [showImportPopup, setShowImportPopup] = useState(false);
   const [showAddToModpack, setShowAddToModpack] = useState(false);
+  const [showExportPopup, setShowExportPopup] = useState(false);
+
   const [selectedMod, setSelectedMod] = useState(null);
+
+  // HMMM???
+  const [originalCollection, setOriginalCollection] = useState([]);
 
   useEffect(() => {
     console.error('LOADING');
@@ -441,17 +448,18 @@ const App = () => {
     const importedModIds = new Set(
       collection.children.map((child) => child.publishedfileid)
     );
-    console.error(importedModIds);
 
     const modsToAdd = mods.filter((mod) =>
       importedModIds.has(mod.id.toString())
     );
-    console.error(modsToAdd);
 
     if (modsToAdd.length === 0) {
       console.log('No matching mods found in the collection');
       return;
     }
+
+    // Save the imported mods separately
+    setOriginalCollection(modsToAdd);
 
     setModpack((prevModpack) => {
       const updatedModpack = [...prevModpack];
@@ -512,8 +520,18 @@ const App = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Left 4 Dead 2 Mod Browser</h1>
-        <p className="header-desc">Find and organize your favorite mods</p>
+        <img
+          src="hand.png"
+          alt="hand.png"
+          // className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+          // onLoad={() => setIsLoaded(true)}
+          height={100}
+          width={100}
+        />
+        <div>
+          <h1>Left 4 Dead 2 Mod Browser</h1>
+          <p className="header-desc">Find and organize your favorite mods</p>
+        </div>
       </header>
 
       <div className="nav-container">
@@ -573,6 +591,7 @@ const App = () => {
                     window.confirm('Are you sure you want to remove all mods?')
                   ) {
                     setModpack([]);
+                    setOriginalCollection([]);
                   }
                 }}
                 className="remove-button"
@@ -582,7 +601,7 @@ const App = () => {
               <button onClick={() => setShowImportPopup(true)}>
                 Import Collection
               </button>
-              <button onClick={() => setShowImportPopup(true)}>
+              <button onClick={() => setShowExportPopup(true)}>
                 Export Collection
               </button>
             </>
@@ -623,12 +642,20 @@ const App = () => {
           allTags={allTags}
           onClose={closeAddToModpackPopup}
           onAdd={addToModpack}
+          tagList={customTags}
         />
       )}
       {showImportPopup && (
         <ImportCollection
           onImport={handleImportCollection}
           onClose={() => setShowImportPopup(false)}
+        />
+      )}
+      {showExportPopup && (
+        <ExportCollection
+          modpack={modpack}
+          originalCollection={originalCollection}
+          onClose={() => setShowExportPopup(false)}
         />
       )}
 

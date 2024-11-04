@@ -64,7 +64,11 @@ const ImportCollection = ({ onImport, onClose }) => {
           </div>
           {error && <p className="error">{error}</p>}
           <div className="popup-buttons">
-            <button type="submit" disabled={isLoading}>
+            <button
+              className="import-button"
+              type="submit"
+              disabled={isLoading}
+            >
               {isLoading ? 'Importing...' : 'Import'}
             </button>
             <button type="button" onClick={onClose}>

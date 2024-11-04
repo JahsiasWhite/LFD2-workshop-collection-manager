@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 let moddableItems = null;
 
-const AddToModpack = ({ mod, onClose, onAdd, allTags }) => {
+const AddToModpack = ({ mod, onClose, onAdd, allTags, tagList }) => {
   const [selectedSlot, setSelectedSlot] = useState('');
   const [selectedSlots, setSelectedSlots] = useState([]);
-  moddableItems = allTags.flatMap((category) => category.tags);
+  // moddableItems = allTags.flatMap((category) => category.tags);
+  moddableItems = tagList.flatMap((category) => category.tags);
+  console.error(moddableItems, tagList);
 
   const compatibleSlots = [];
   moddableItems = moddableItems.filter((item) => {
@@ -38,8 +40,18 @@ const AddToModpack = ({ mod, onClose, onAdd, allTags }) => {
   return (
     <div className="add-to-modpack-popup">
       <div className="popup-content">
-        <h2>Add {mod.title} to Modpack</h2>
-        <p>Choose a slot</p>
+        <div className="modpack-slot-header">
+          <h2>Add {mod.title} to Modpack</h2>
+          <div className="popup-buttons">
+            <button type="submit" onClick={handleSubmit}>
+              Add
+            </button>
+            <button type="button" onClick={onClose}>
+              Cancel
+            </button>
+          </div>
+        </div>
+        <p className="choose-slot">Choose a slot</p>
         <form onSubmit={handleSubmit}>
           <div>
             <h3>Compatible Slots:</h3>
@@ -72,12 +84,6 @@ const AddToModpack = ({ mod, onClose, onAdd, allTags }) => {
                 <label htmlFor={slot}>{slot}</label>
               </div>
             ))}
-          </div>
-          <div className="popup-buttons">
-            <button type="submit">Add</button>
-            <button type="button" onClick={onClose}>
-              Cancel
-            </button>
           </div>
         </form>
       </div>

@@ -290,6 +290,11 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
   }, [modpack]);
 
   const toggleModpackList = () => {
+    // Don't open the list if there are no mods to show
+    // if (!isModpackListOpen && modpack.length === 0) {
+    //   return;
+    // }
+
     setIsModpackListOpen(!isModpackListOpen);
   };
 
@@ -348,8 +353,11 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
         </button>
         {isModpackListOpen && (
           <div className="modpack-list">
+            {modpack.length === 0
+              ? 'No mods have been added yet! Import a collection or browse mods to get started'
+              : ''}
             {modpack.map((mod) => (
-              <div key={mod.id} className="modpack-item">
+              <div key={mod.id} className="list-item modpack-item">
                 <span>{mod.title}</span>
                 <span>{mod.tags}</span>
                 <button

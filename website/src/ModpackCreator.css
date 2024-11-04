@@ -41,11 +41,7 @@
 }
 
 .modpack-item {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #e5e7eb;
 }
 
 .remove-button {
@@ -223,9 +219,11 @@
 }
 
 .popup-content {
-  background-color: black;
+  z-index: 2;
+  background-color: var(--background-color);
   color: var(--white);
   padding: 24px;
+  padding-top: 0px;
   border-radius: 8px;
   max-width: 80%;
   max-height: 80%;
