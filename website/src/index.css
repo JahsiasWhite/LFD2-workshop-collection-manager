@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../public/FutureRot.woff2') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -41,7 +48,7 @@ a:visited {
 }
 
 .footer {
-  background-image: url(../public/footer_img.jpg);
+  /* background-image: url(../public/footer2.jpg); */
   background-repeat: no-repeat;
   position: fixed;
   bottom: 0px;
@@ -59,6 +66,8 @@ a:visited {
 }
 
 .app-header {
+  font-family: 'CustomFont';
+
   /* background-color: #2c3e50; */
   color: var(--white);
   padding: 20px;
@@ -140,6 +149,7 @@ button:hover {
 }
 
 .mod-card h3 {
+  /* font-family: 'CustomFont'; */
   margin-top: 0;
   margin-bottom: 10px;
   /* color: #2c3e50; */
@@ -325,3 +335,7 @@ button:hover {
 /* .choose-slot {
   margin-top: 6vh;
 } */
+
+.export-mod-details {
+  margin-left: 1%;
+}

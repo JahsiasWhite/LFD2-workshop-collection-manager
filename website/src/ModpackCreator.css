@@ -103,108 +103,6 @@
   gap: 16px;
 }
 
-.tag-card {
-  background-color: #d3d3d3;
-  border-radius: 12px;
-  overflow: visible;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  cursor: pointer;
-  position: relative;
-  /* max-height: 400px; */
-}
-
-.tag-card:hover {
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-}
-
-.tag-card-content {
-  height: 50%;
-  z-index: 2;
-}
-
-.tag-image {
-  width: 100%;
-  /* height: 100%;
-  object-fit: cover; */
-}
-
-.tag-info {
-  width: 100%;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* background-color: black; */
-
-  position: relative;
-  z-index: 2;
-}
-
-.tag-info h4 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.tag-info .category {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.tag-info .status {
-  font-weight: 500;
-}
-
-.tag-info .status.added {
-  color: #4caf50;
-}
-
-.tag-info .status.missing {
-  color: #f44336;
-}
-
-.tag-info .count {
-  font-size: 0.9rem;
-}
-
-.tag-card-details {
-  position: relative;
-  /* bottom: 1000%; */
-  bottom: -25%;
-  /* top: 100%; */
-  transform: translateY(-10px);
-  height: auto;
-  max-height: 25%;
-  z-index: 1;
-  background-color: blue;
-}
-
-.tag-card.expanded .tag-card-details {
-  transform: translateY(0);
-}
-
-.tag-card-details h5 {
-  margin-top: 0;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.tag-card-details ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.tag-card-details li {
-  font-size: 0.9rem;
-  margin-bottom: 4px;
-}
-
-.tag-card.missing-tag {
-  opacity: 0.7;
-}
-
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -303,4 +201,27 @@
 
 .untagged-mod-item .remove-button:hover {
   background-color: #dc2626;
+}
+
+.slot-item {
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.highlighted-slot {
+  background-color: rgba(59, 130, 246, 0.2); /* Light blue background */
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(59, 130, 246, 0.2);
+  }
+  50% {
+    background-color: rgba(59, 130, 246, 0.3);
+  }
+  100% {
+    background-color: rgba(59, 130, 246, 0.2);
+  }
 }

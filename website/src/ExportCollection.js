@@ -45,20 +45,25 @@ const ExportCollection = ({ modpack, onClose, originalCollection }) => {
           {/* Collection Stats */}
           <div>
             <div>
-              <div>Total Mods: {modpack.length}</div>
+              <h3>Total Mods: {modpack.length}</h3>
             </div>
             <div>
+              <h3>
+                Total Mods Changed: {addedMods.length + removedMods.length}
+              </h3>
+            </div>
+            {/* <div>
               <div>Added Mods: {addedMods.length}</div>
             </div>
             <div>
               <div>Removed Mods: {removedMods.length}</div>
-            </div>
+            </div> */}
           </div>
 
           {/* Added Mods */}
           {addedMods.length > 0 && (
             <div>
-              <h3>Added Mods ({addedMods.length})</h3>
+              <h3>Added Mods: ({addedMods.length})</h3>
               <div>
                 {addedMods.map((mod) => (
                   <div key={mod.id} className="list-item">
@@ -78,7 +83,7 @@ const ExportCollection = ({ modpack, onClose, originalCollection }) => {
                         className="mod-card-img"
                       />
                     )}
-                    <div className="flex-grow">
+                    <div className="export-mod-details">
                       <a
                         href={mod.url}
                         target="_blank"
@@ -104,7 +109,7 @@ const ExportCollection = ({ modpack, onClose, originalCollection }) => {
           {/* Removed Mods */}
           {removedMods.length > 0 && (
             <div>
-              <h3>Removed Mods ({removedMods.length})</h3>
+              <h3>Removed Mods: ({removedMods.length})</h3>
               <div className="space-y-3">
                 {removedMods.map((mod) => (
                   <div key={mod.id}>
@@ -115,7 +120,7 @@ const ExportCollection = ({ modpack, onClose, originalCollection }) => {
                         className="mod-card-img"
                       />
                     )}
-                    <div className="flex-grow">
+                    <div className="export-mod-details">
                       <a
                         href={mod.url}
                         target="_blank"

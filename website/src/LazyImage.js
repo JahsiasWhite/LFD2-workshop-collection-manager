@@ -32,7 +32,7 @@ const LazyImage = ({ src, alt, className }) => {
       )}
       {isInView && (
         <img
-          //   src={src}
+          src={src}
           alt={alt}
           className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setIsLoaded(true)}

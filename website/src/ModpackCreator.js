@@ -4,6 +4,7 @@ import './ModpackCreator.css';
 import LazyImage from './LazyImage';
 
 import TagCard from './TagCard';
+import AddToModpack from './AddToModpack';
 
 const allTags = [
   {
@@ -208,26 +209,40 @@ const tagVariations = {
   // 'Grenade Launcher Grenade': ['GL Grenade', 'Launcher Grenade'],
   // 'Tank Rock': ['Tank Boulder', 'Tank Stone'],
   // 'Common Infected': ['Commons', 'Regular Infected', 'Normal Infected'],
+  'CEDA Worker Infected': ['CEDA'],
+  'Mud Men': ['Mudmen'],
+  'Road Crew': ['Roadcrew'],
   // 'Special Infected': ['Specials', 'SI'],
   // Medkit: ['Med Kit', 'Medical Kit', 'First Aid Kit'],
   // Pills: ['Pain Pills', 'Pain Killers'],
 };
 
-const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
+const ModpackCreator = ({
+  mods,
+  modpack,
+  removeFromModpack,
+  onTagSearch,
+  onAdd,
+}) => {
   const [tagCounts, setTagCounts] = useState({});
   const [isModpackListOpen, setIsModpackListOpen] = useState(false);
   const [expandedCard, setExpandedCard] = useState(null);
+
   const [showPopup, setShowPopup] = useState(false);
+  const [showModEditPopup, setShowModEditPopup] = useState(false);
+
   const [filteredMods, setFilteredMods] = useState([]);
   const [untaggedMods, setUntaggedMods] = useState([]);
 
   // Function to normalize text for comparison
   const normalizeText = (text) => {
-    return text
-      .toLowerCase()
-      .replace(/[-_]/g, '') // Remove hyphens and underscores
-      .replace(/\s+/g, '') // Remove spaces
-      .trim();
+    return (
+      text
+        .toLowerCase()
+        .replace(/[-_]/g, '') // Remove hyphens and underscores
+        // .replace(/\s+/g, '') // Remove spaces
+        .trim()
+    );
   };
 
   // Function to check if a mod's title or tags match any variations
@@ -266,8 +281,17 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
             )
           : [];
 
+        // remove generic addedTags from the variationMatches
+        if (variationMatches.length > 0) {
+          variationMatches.forEach((mod) => {
+            mod.addedTags = [];
+          });
+        }
+
         // Combine unique matches
-        const allMatches = [...new Set([...exactMatches, ...variationMatches])];
+        // const allMatches = [...new Set([...exactMatches, ...variationMatches])];
+        const allMatches =
+          variationMatches.length > 0 ? variationMatches : exactMatches;
         counts[tag] = allMatches.length;
 
         // Add the tag to mods that match variations but don't have the tag yet
@@ -312,6 +336,17 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
   const closePopup = () => {
     setShowPopup(false);
     setFilteredMods([]);
+  };
+
+  const closeModEditPopup = () => {
+    setShowModEditPopup(false);
+    // setFilteredMods([]);
+  };
+
+  const [selectedMod, setSelectedMod] = useState(null);
+  const editMod = (mod) => {
+    setShowModEditPopup(true);
+    setSelectedMod(mod);
   };
 
   return (
@@ -359,13 +394,16 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
             {modpack.map((mod) => (
               <div key={mod.id} className="list-item modpack-item">
                 <span>{mod.title}</span>
-                <span>{mod.tags}</span>
-                <button
-                  onClick={() => removeFromModpack(mod.id)}
-                  className="remove-button"
-                >
-                  Remove
-                </button>
+                <span>{mod.addedTags}</span>
+                <div>
+                  <button onClick={() => editMod(mod)}>Edit</button>
+                  <button
+                    onClick={() => removeFromModpack(mod.id)}
+                    className="remove-button"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -379,12 +417,15 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
             {untaggedMods.map((mod) => (
               <li key={mod.id} className="untagged-mod-item">
                 <span>{mod.title}</span>
-                <button
-                  onClick={() => removeFromModpack(mod.id)}
-                  className="remove-button"
-                >
-                  Remove
-                </button>
+                <div>
+                  <button onClick={() => editMod(mod)}>Edit</button>
+                  <button
+                    onClick={() => removeFromModpack(mod.id)}
+                    className="remove-button"
+                  >
+                    Remove
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -409,6 +450,8 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
                   onCardClick={handleCardClick}
                   isExpanded={expandedCard === tag}
                   onTagSearch={onTagSearch}
+                  removeFromModpack={removeFromModpack}
+                  editMod={editMod}
                 />
               ))}
             </div>
@@ -439,6 +482,15 @@ const ModpackCreator = ({ mods, modpack, removeFromModpack, onTagSearch }) => {
             </ul>
           </div>
         </div>
+      )}
+
+      {showModEditPopup && (
+        <AddToModpack
+          mod={selectedMod}
+          onAdd={onAdd}
+          onClose={closeModEditPopup}
+          // highlightedTag={'searchedTag'}
+        />
       )}
     </div>
   );

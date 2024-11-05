@@ -314,12 +314,31 @@ const App = () => {
   }, []);
 
   const addToModpack = (mod, slot) => {
-    if (!modpack.some((m) => m.id === mod.id)) {
+    const existingModIndex = modpack.findIndex((m) => m.id === mod.id);
+
+    if (existingModIndex === -1) {
+      // If mod is not in modpack, add it with the new tag
       if (mod.addedTags === undefined) mod.addedTags = [];
       mod.addedTags.push(slot);
       setModpack([...modpack, mod]);
+    } else {
+      // If mod exists in modpack, update its addedTags
+      const updatedModpack = [...modpack];
+      if (!updatedModpack[existingModIndex].addedTags) {
+        updatedModpack[existingModIndex].addedTags = [];
+      }
+
+      if (!updatedModpack[existingModIndex].addedTags.includes(slot)) {
+        updatedModpack[existingModIndex].addedTags.push(slot);
+      }
+
+      console.error(updatedModpack[existingModIndex]);
+      setModpack(updatedModpack); // Update state with the modified modpack
+
+      // mod.addedTags = [];
+      // mod.addedTags.push(slot);
+      // setModpack([...modpack, mod]);
     }
-    console.error('ADDING ', mod, slot);
   };
 
   const removeFromModpack = (modId) => {
@@ -499,8 +518,6 @@ const App = () => {
   };
 
   const handleTagSearch = (search) => {
-    setSearchTerm(search);
-
     // Find the category that contains the searched tag
     const foundCategory = customTags.find((categoryObj) =>
       categoryObj.tags.includes(search)
@@ -510,7 +527,9 @@ const App = () => {
       setSelectedTag(search);
     } else if (foundCategory.category === 'Extras') {
       setSelectedTag('Miscellaneous');
+      setSearchTerm(search);
     } else {
+      setSearchTerm(search);
       setSelectedTag('');
     }
 
@@ -520,14 +539,7 @@ const App = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <img
-          src="hand.png"
-          alt="hand.png"
-          // className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-          // onLoad={() => setIsLoaded(true)}
-          height={100}
-          width={100}
-        />
+        <img src="hand.png" alt="hand" height={100} width={100} />
         <div>
           <h1>Left 4 Dead 2 Mod Browser</h1>
           <p className="header-desc">Find and organize your favorite mods</p>
@@ -633,16 +645,17 @@ const App = () => {
           removeFromModpack={removeFromModpack}
           onTagSearch={handleTagSearch}
           allTags={allTags}
+          onAdd={addToModpack}
         />
       )}
 
       {showAddToModpack && selectedMod && (
         <AddToModpack
           mod={selectedMod}
-          allTags={allTags}
+          // allTags={allTags}
           onClose={closeAddToModpackPopup}
           onAdd={addToModpack}
-          tagList={customTags}
+          highlightedTag={searchTerm}
         />
       )}
       {showImportPopup && (
