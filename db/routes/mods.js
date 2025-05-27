@@ -70,41 +70,37 @@ router.get('/mods', async (req, res) => {
 });
 
 // Add this new endpoint to your existing router
-// router.post('/mods/batch', async (req, res) => {
-//   try {
-//     const db = req.app.locals.db;
-//     const { modIds } = req.body;
+router.post('/mods/batch', async (req, res) => {
+  try {
+    const db = req.app.locals.db;
+    const { modIds } = req.body;
 
-//     // Validate input
-//     // if (!Array.isArray(modIds)) {
-//     //   return res.status(400).json({ error: 'modIds must be an array' });
-//     // }
-//     // Validate input
-//     if (!modIds || typeof modIds[Symbol.iterator] !== 'function') {
-//       return res.status(400).json({ error: 'modIds must be iterable' });
-//     }
-//     const modIdsArray = Array.from(modIds).map((id) => id.toString());
-//     if (modIdsArray.length === 0) {
-//       return res.json({ mods: [], total: 0 });
-//     }
+    // Validate input
+    // if (!Array.isArray(modIds)) {
+    //   return res.status(400).json({ error: 'modIds must be an array' });
+    // }
+    // Validate input
+    if (!modIds || typeof modIds[Symbol.iterator] !== 'function') {
+      return res.status(400).json({ error: 'modIds must be iterable' });
+    }
+    const modIdsArray = Array.from(modIds).map((id) => id.toString());
+    if (modIdsArray.length === 0) {
+      return res.json({ mods: [], total: 0 });
+    }
 
-//     // Convert strings to ObjectId if you're using MongoDB ObjectIds
-//     // const { ObjectId } = require('mongodb');
-//     // const objectIds = modIds.map(id => new ObjectId(id));
+    const mods = await db
+      .collection('mods')
+      .find({ id: { $in: modIdsArray } })
+      .toArray();
 
-//     const mods = await db
-//       .collection('mods')
-//       .find({ _id: { $in: modIdsArray } })
-//       .toArray();
-
-//     res.json({
-//       mods,
-//       total: mods.length,
-//     });
-//   } catch (error) {
-//     console.error('Database error:', error);
-//     res.status(500).json({ error: 'Failed to fetch mods batch' });
-//   }
-// });
+    res.json({
+      mods,
+      total: mods.length,
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Failed to fetch mods batch' });
+  }
+});
 
 module.exports = router;

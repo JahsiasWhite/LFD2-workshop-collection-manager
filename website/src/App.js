@@ -556,13 +556,14 @@ const App = () => {
   };
 
   const fetchModsByIds = async (modIds) => {
+    console.error(modIds, JSON.stringify(modIds));
     try {
       const response = await fetch(`${API_URL}/mods/batch`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ modIds }),
+        body: JSON.stringify({ modIds: Array.from(modIds) }),
       });
       const data = await response.json();
       if (data.error) return [];
@@ -574,6 +575,7 @@ const App = () => {
   };
 
   const handleImportCollection = async (collection) => {
+    console.error('TEST2', collection);
     if (!collection.children || !Array.isArray(collection.children)) {
       console.error('Invalid collection format');
       return;
@@ -614,7 +616,7 @@ const App = () => {
     console.log(`Added ${modsToAdd.length} mods to the modpack`);
 
     // Optionally, you might want to update filteredMods here if needed
-    filterAndSortMods();
+    // filterAndSortMods();
   };
 
   const addCustomTags = (mod) => {
