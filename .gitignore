@@ -5,3 +5,5 @@
 workshop_items.json
 
 node_modules
+
+.env

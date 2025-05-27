@@ -7,6 +7,8 @@ import ImportCollection from './ImportCollection';
 import ExportCollection from './ExportCollection';
 import LazyImage from './LazyImage';
 
+const API_URL = 'http://localhost:3000/api/db';
+
 const allTags = [
   {
     category: 'Survivors',
@@ -261,6 +263,9 @@ const App = () => {
   const [view, setView] = useState('browser');
   const [modpack, setModpack] = useState([]);
   const [sizeFilter, setSizeFilter] = useState({ min: 0, max: Infinity });
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   const [showImportPopup, setShowImportPopup] = useState(false);
   const [showAddToModpack, setShowAddToModpack] = useState(false);
@@ -271,47 +276,105 @@ const App = () => {
   // HMMM???
   const [originalCollection, setOriginalCollection] = useState([]);
 
-  useEffect(() => {
-    console.error('LOADING');
-    const fetchMods = async () => {
-      try {
-        const response = await fetch('workshop_items1.json');
-        const data1 = await response.json();
-        const response2 = await fetch('workshop_items2.json');
-        const data2 = await response2.json();
-        // const response4 = await fetch('workshop_items4.json');
-        // const data4 = await response4.json();
-        // const response5 = await fetch('workshop_items5.json');
-        // const data5 = await response5.json();
-        // Combine the two datasets
-        const combinedData = [...data1, ...data2];
-        // Remove duplicates based on the 'id' field
-        const uniqueData = Array.from(
-          new Map(combinedData.map((item) => [item.id, item])).values()
-        );
+  // useEffect(() => {
+  //   const fetchMods = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await fetch(
+  //         `http://localhost:3000/api/db/mods?page=${page}`
+  //       );
+  //       const data = await response.json();
 
-        // Set data
-        setMods(uniqueData);
-        setFilteredMods(uniqueData);
-        console.error('TOTAL NUMBER OF MODS: ', uniqueData.length);
-        console.error(
-          'TOTAL SIZE: ',
-          (
-            uniqueData.reduce((acc, mod) => {
-              const size = parseInt(mod.file_size);
-              return acc + (isNaN(size) ? 0 : size);
-            }, 0) /
-            (1024 * 1024 * 1024)
-          ).toFixed(2),
-          ' GB'
-        );
-      } catch (error) {
-        console.error('Error fetching mod data:', error);
+  //       if (page === 1) {
+  //         setMods(data.mods);
+  //         setFilteredMods(data.mods);
+  //       } else {
+  //         setMods((prevMods) => [...prevMods, ...data.mods]);
+  //         setFilteredMods((prevMods) => [...prevMods, ...data.mods]);
+  //       }
+
+  //       setHasMore(data.hasMore);
+  //       console.error('TOTAL NUMBER OF MODS: ', data.total);
+  //     } catch (error) {
+  //       console.error('Error fetching mod data:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchMods();
+  // }, [page]);
+
+  const fetchMods = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${API_URL}/mods?page=${page}&search=${searchTerm}&tag=${selectedTag}&sortBy=${sortBy}`
+      );
+      const data = await response.json();
+
+      // TODO
+      if (data.error) {
+        return;
       }
-    };
 
+      // TODO
+      // Something is wrong with prevMods I think. If we change around and go back to Most subscriptions,
+      // it's not showing the previous mods we initally had.
+      // if (page === 1 && false) {
+      //   setMods(data.mods);
+      //   setFilteredMods(data.mods);
+      // } else {
+      //   setMods((prevMods) => [...prevMods, ...data.mods]);
+      //   setFilteredMods((prevMods) => [...prevMods, ...data.mods]);
+      // }
+      const newMods = data.mods.filter(
+        (newMod) => !mods.some((existingMod) => existingMod.id === newMod.id)
+      );
+      let modTemp = [];
+      if (mods.length === 0) {
+        modTemp = newMods;
+        setMods(newMods);
+        setFilteredMods(newMods);
+      } else {
+        modTemp = [...mods, ...newMods];
+        setMods((prevMods) => [...prevMods, ...newMods]);
+        setFilteredMods((prevMods) => [...prevMods, ...newMods]);
+      }
+
+      setHasMore(data.hasMore);
+
+      filterAndSortMods(modTemp);
+    } catch (error) {
+      console.error('Error fetching mod data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchMods();
-  }, []);
+  }, [page, searchTerm, selectedTag, sortBy]); // Add search dependencies
+  // Reset page when search terms change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, selectedTag]);
+  const handleSortChange = (newSortBy) => {
+    setMods([]);
+    setFilteredMods([]);
+    setPage(1);
+    setSortBy(newSortBy);
+  };
+
+  // Simple scroll handler
+  const handleScroll = ({ scrollOffset, scrollUpdateWasRequested }) => {
+    if (scrollUpdateWasRequested || loading || !hasMore) return;
+
+    // If we're near the bottom (within 1000px), load more
+    if (scrollOffset > filteredMods.length * 230 - 1000) {
+      setPage((p) => p + 1);
+      console.error('Updating "page" ', page);
+    }
+  };
 
   const addToModpack = (mod, slot) => {
     const existingModIndex = modpack.findIndex((m) => m.id === mod.id);
@@ -350,9 +413,47 @@ const App = () => {
     setSelectedMod(null);
   };
 
-  const filterAndSortMods = useCallback(() => {
-    console.error(selectedTag);
+  // const filterAndSortMods = useCallback(() => {
+  //   let result = mods.filter((mod) => {
+  //     const titleMatch = mod.title
+  //       .toLowerCase()
+  //       .includes(searchTerm.toLowerCase());
+  //     const tagMatch = selectedTag === '' || mod.tags.includes(selectedTag);
+  //     const sizeMatch =
+  //       mod.file_size >= sizeFilter.min * 1024 * 1024 &&
+  //       mod.file_size <= sizeFilter.max * 1024 * 1024;
 
+  //     let categoryMatch = true;
+  //     if (selectedCategory !== '' && selectedCategory !== 'Extras') {
+  //       categoryMatch = mod.tags.length <= 6;
+  //     }
+
+  //     return titleMatch && tagMatch && sizeMatch && categoryMatch;
+  //   });
+
+  //   switch (sortBy) {
+  //     case 'subscriptionsDesc':
+  //       result.sort((a, b) => b.subscriptions - a.subscriptions);
+  //       break;
+  //     case 'subscriptionsAsc':
+  //       result.sort((a, b) => a.subscriptions - b.subscriptions);
+  //       break;
+  //     case 'titleAsc':
+  //       result.sort((a, b) => a.title.localeCompare(b.title));
+  //       break;
+  //     case 'titleDesc':
+  //       result.sort((a, b) => b.title.localeCompare(a.title));
+  //       break;
+  //     case 'fileSize':
+  //       result.sort((a, b) => b.file_size - a.file_size);
+  //       break;
+  //     default:
+  //       break;
+  //   }
+
+  //   setFilteredMods(result);
+  // }, [mods, searchTerm, selectedTag, sortBy, sizeFilter]);
+  const filterAndSortMods = (mods) => {
     let result = mods.filter((mod) => {
       const titleMatch = mod.title
         .toLowerCase()
@@ -366,15 +467,12 @@ const App = () => {
       if (selectedCategory !== '' && selectedCategory !== 'Extras') {
         categoryMatch = mod.tags.length <= 6;
       }
-      // Add similar conditions for other categories if needed
-      // For example:
-      // else if (selectedCategory === 'Infected') {
-      //   categoryMatch = mod.tags.length <= 8;
-      // }
 
       return titleMatch && tagMatch && sizeMatch && categoryMatch;
     });
 
+    // TODO: MAJOR GLITCH
+    // Basically, MongoDB sorts way different. EX: Emoji is end of Mongo list but start of our list
     switch (sortBy) {
       case 'subscriptionsDesc':
         result.sort((a, b) => b.subscriptions - a.subscriptions);
@@ -389,7 +487,6 @@ const App = () => {
         result.sort((a, b) => b.title.localeCompare(a.title));
         break;
       case 'fileSize':
-        console.error(mods);
         result.sort((a, b) => b.file_size - a.file_size);
         break;
       default:
@@ -397,12 +494,12 @@ const App = () => {
     }
 
     setFilteredMods(result);
-  }, [mods, searchTerm, selectedTag, sortBy, sizeFilter]);
+  };
 
   // TODO This infinetly runs???
-  useEffect(() => {
-    filterAndSortMods();
-  }, [filterAndSortMods]);
+  // useEffect(() => {
+  //   filterAndSortMods();
+  // }, [filterAndSortMods]);
 
   const handleAddToModpackClick = (mod) => {
     setSelectedMod(mod);
@@ -458,7 +555,25 @@ const App = () => {
     );
   };
 
-  const handleImportCollection = (collection) => {
+  const fetchModsByIds = async (modIds) => {
+    try {
+      const response = await fetch(`${API_URL}/mods/batch`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ modIds }),
+      });
+      const data = await response.json();
+      if (data.error) return [];
+      return data.mods;
+    } catch (error) {
+      console.error('Error fetching mods by IDs:', error);
+      return [];
+    }
+  };
+
+  const handleImportCollection = async (collection) => {
     if (!collection.children || !Array.isArray(collection.children)) {
       console.error('Invalid collection format');
       return;
@@ -468,9 +583,11 @@ const App = () => {
       collection.children.map((child) => child.publishedfileid)
     );
 
-    const modsToAdd = mods.filter((mod) =>
-      importedModIds.has(mod.id.toString())
-    );
+    const modsToAdd = await fetchModsByIds(importedModIds);
+
+    // const modsToAdd = mods.filter((mod) =>
+    //   importedModIds.has(mod.id.toString())
+    // );
 
     if (modsToAdd.length === 0) {
       console.log('No matching mods found in the collection');
@@ -527,11 +644,10 @@ const App = () => {
       setSelectedTag(search);
     } else if (foundCategory.category === 'Extras') {
       setSelectedTag('Miscellaneous');
-      setSearchTerm(search);
     } else {
-      setSearchTerm(search);
       setSelectedTag('');
     }
+    setSearchTerm(search);
 
     setView('browser');
   };
@@ -542,7 +658,9 @@ const App = () => {
         <img src="hand.png" alt="hand" height={100} width={100} />
         <div>
           <h1>Left 4 Dead 2 Mod Browser</h1>
-          <p className="header-desc">Find and organize your favorite mods</p>
+          <p className="header-desc">
+            Find and organize your favorite mods and collections
+          </p>
         </div>
       </header>
 
@@ -581,7 +699,7 @@ const App = () => {
             <select
               id="sort-select"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
             >
               <option value="subscriptionsDesc">Most Subscriptions</option>
               <option value="subscriptionsAsc">Least Subscriptions</option>
@@ -634,6 +752,7 @@ const App = () => {
             itemSize={230}
             width="100%"
             style={{ overflowX: 'hidden', borderRadius: '8px' }}
+            onScroll={handleScroll}
           >
             {ModCard}
           </List>
