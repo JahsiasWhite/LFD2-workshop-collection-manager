@@ -296,7 +296,7 @@ const App = () => {
         />
 
         <div style={{ marginLeft: '10px' }}>
-          <h3>{mod.title}</h3>
+          <h3 className="mod-title">{mod.title}</h3>
           <p>Subscriptions: {mod.subscriptions}</p>
           <p>File Size: {(mod.file_size / 1024 / 1024).toFixed(2)} MB</p>
           <div>

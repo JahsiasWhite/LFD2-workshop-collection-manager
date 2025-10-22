@@ -178,24 +178,51 @@ const ModpackCreator = ({
         </button>
         {isModpackListOpen && (
           <div className="modpack-list">
-            {modpack.length === 0
+            {/* {modpack.length === 0
               ? 'No mods have been added yet! Import a collection or browse mods to get started'
-              : ''}
-            {modpack.map((mod) => (
-              <div key={mod.id} className="list-item modpack-item">
-                <span>{mod.title}</span>
-                <span>{mod.addedTags}</span>
-                <div>
-                  <button onClick={() => editMod(mod)}>Edit</button>
-                  <button
-                    onClick={() => removeFromModpack(mod.id)}
-                    className="remove-button"
-                  >
-                    Remove
-                  </button>
+              : ''} */}
+
+            {modpack.length === 0 ? (
+              <p>
+                No mods have been added yet! Import a collection or browse mods
+                to get started.
+              </p>
+            ) : (
+              <>
+                {/* Header row */}
+                <div className="list-header modpack-item">
+                  <span className="col-title">Title</span>
+                  <span className="col-tags">Tags</span>
+                  <span className="col-actions">Actions</span>
                 </div>
-              </div>
-            ))}
+                {modpack.map((mod) => (
+                  <div key={mod.id} className="list-item modpack-item">
+                    <span>{mod.title}</span>
+                    {/* {Array.isArray(mod.addedTags)
+                      ? mod.addedTags.join(', ')
+                      : mod.addedTags} */}
+                    <span className="col-tags">
+                      {Array.isArray(mod.addedTags)
+                        ? mod.addedTags.map((tag) => (
+                            <span key={tag} className="tag-pill">
+                              {tag}
+                            </span>
+                          ))
+                        : mod.addedTags}
+                    </span>
+                    <div>
+                      <button onClick={() => editMod(mod)}>Edit</button>
+                      <button
+                        onClick={() => removeFromModpack(mod.id)}
+                        className="remove-button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
       </div>

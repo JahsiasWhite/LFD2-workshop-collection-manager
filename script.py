@@ -145,7 +145,7 @@ def main():
     load_dotenv() # Load environment variables from .env file
     
     app_id = "550"  # !REQUIRED Replace with the app ID of the game you're interested in
-    api_key = os.getenv("API_KEY")  # !REQUIRED Replace with your Steam Web API key
+    api_key = os.getenv("API_KEY")
     creator_app_id = "" # This can be multiple??? So far I've seen: 550, 563
 
     if api_key == "":
