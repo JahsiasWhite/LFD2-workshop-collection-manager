@@ -68,15 +68,6 @@ const ExportCollection = ({ modpack, onClose, originalCollection }) => {
                 {addedMods.map((mod) => (
                   <div key={mod.id} className="list-item">
                     {mod.preview_url && (
-                      //   <img
-                      //     src={mod.preview_url}
-                      //     alt={mod.title}
-                      //     className="w-16 h-16 object-cover rounded mr-3"
-                      //     onError={(e) => {
-                      //       e.target.onerror = null;
-                      //       e.target.src = '/api/placeholder/64/64';
-                      //     }}
-                      //   />
                       <LazyImage
                         src={mod.preview_url}
                         alt={mod.title}

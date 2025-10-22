@@ -1,13 +1,10 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
 
 import './ModpackCreator.css';
-import LazyImage from './components/LazyImage';
 
 import TagCard from './components/TagCard';
 import AddToModpack from './AddToModpack';
 import { allTags, tagVariations } from './constants/tags';
-
-// Remove the old allTags definition since we're importing it
 
 const ModpackCreator = ({
   mods,
@@ -143,15 +140,6 @@ const ModpackCreator = ({
     <div id="modpack-creator" className="view active">
       <h2>Modpack Creator</h2>
 
-      {/* <div id="modpack-list">
-        {modpack.map((mod) => (
-          <div key={mod.id} className="modpack-item">
-            <span>{mod.title}</span>
-            <button onClick={() => removeFromModpack(mod.id)}>Remove</button>
-          </div>
-        ))}
-      </div> */}
-
       <div id="modpack-stats">
         <p>Total mods: {modpack.length}</p>
         <p>
@@ -178,10 +166,6 @@ const ModpackCreator = ({
         </button>
         {isModpackListOpen && (
           <div className="modpack-list">
-            {/* {modpack.length === 0
-              ? 'No mods have been added yet! Import a collection or browse mods to get started'
-              : ''} */}
-
             {modpack.length === 0 ? (
               <p>
                 No mods have been added yet! Import a collection or browse mods
@@ -198,9 +182,6 @@ const ModpackCreator = ({
                 {modpack.map((mod) => (
                   <div key={mod.id} className="list-item modpack-item">
                     <span>{mod.title}</span>
-                    {/* {Array.isArray(mod.addedTags)
-                      ? mod.addedTags.join(', ')
-                      : mod.addedTags} */}
                     <span className="col-tags">
                       {Array.isArray(mod.addedTags)
                         ? mod.addedTags.map((tag) => (

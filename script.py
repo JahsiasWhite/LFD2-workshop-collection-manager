@@ -73,7 +73,7 @@ def get_workshop_items(app_id, api_key, single_request=False):
                 "time_created": datetime.fromtimestamp(item.get("time_created", 0)).isoformat(),
                 "subscriptions": item.get("subscriptions", 0),
                 "favorited": item.get("favorited", 0),
-                "file_size": item.get("file_size", 0),
+                "file_size": int(item.get("file_size", 0)) if str(item.get("file_size", 0)).isdigit() else 0, # Convert to float
                 "preview_url": item.get("preview_url", ""),
                 "tags": [tag.get("tag", "") for tag in item.get("tags", [])],
                 "type": item.get("file_type", 0),
