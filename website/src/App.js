@@ -6,252 +6,13 @@ import AddToModpack from './AddToModpack';
 import ImportCollection from './ImportCollection';
 import ExportCollection from './ExportCollection';
 import LazyImage from './LazyImage';
+import LoadingSpinner from './components/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
+import { useToast } from './contexts/ToastContext';
+import { allTags, customTags } from './constants/tags';
+import './App.css';
 
-const API_URL = 'http://localhost:3000/api/db';
-
-const allTags = [
-  {
-    category: 'Survivors',
-    tags: [
-      'Survivors',
-      'Bill',
-      'Francis',
-      'Zoey',
-      'Louis',
-      'Coach',
-      'Ellis',
-      'Nick',
-      'Rochelle',
-    ],
-  },
-
-  {
-    category: 'Infected',
-    tags: [
-      'Common Infected',
-      'Special Infected',
-      'Hunter',
-      'Smoker',
-      'Boomer',
-      'Jockey',
-      'Spitter',
-      'Charger',
-      'Witch',
-      'Tank',
-    ],
-  },
-
-  {
-    category: 'Weapons',
-    tags: [
-      'Weapons',
-      'Shotgun',
-      'Grenade Launcher',
-      'Rifle',
-      'M60',
-      'Melee',
-      'SMG',
-      'Pistol',
-      'Sniper',
-      'Throwable',
-    ],
-  },
-
-  {
-    category: 'Medical',
-    tags: ['Medkit', 'Pills', 'Adrenaline', 'Defibrillator'],
-  },
-
-  {
-    category: 'Music',
-    tags: ['Sounds'],
-  },
-
-  {
-    category: 'Extras',
-    tags: ['Miscellaneous', 'Textures', 'Items', 'UI', 'Other', 'Models'],
-  },
-];
-
-const customTags = [
-  {
-    category: 'Survivors',
-    tags: [
-      'Bill',
-      'Francis',
-      'Zoey',
-      'Louis',
-      'Coach',
-      'Ellis',
-      'Nick',
-      'Rochelle',
-    ],
-  },
-  {
-    category: 'Infected',
-    tags: [
-      'Common Infected',
-      'Riot Infected',
-      'Mud Men',
-      'Clown Infected',
-      'CEDA Worker Infected',
-      'Road Crew',
-      'Fallen Survivor',
-    ],
-  },
-  {
-    category: 'Special Infected',
-    tags: [
-      'Hunter',
-      'Smoker',
-      'Boomer',
-      'Jockey',
-      'Spitter',
-      'Charger',
-      'Witch',
-      'Tank',
-    ],
-  },
-  {
-    category: 'Melee Weapons',
-    tags: [
-      'Axe',
-      'Baseball Bat',
-      'Chainsaw',
-      'Cricket Bat',
-      'Crowbar',
-      'Frying Pan',
-      'Golf Club',
-      'Guitar',
-      'Katana',
-      'Machete',
-      'Tonfa',
-      'Shovel',
-      'Pitchfork',
-      'Combat Knife',
-    ],
-  },
-  {
-    category: 'Handguns',
-    tags: ['P220 Pistol', 'Glock 17', 'Magnum'],
-  },
-  {
-    category: 'SMGs',
-    tags: [
-      'Submachine Gun (UZI)',
-      'Silenced Submachine Gun (Mac-10)',
-      'H&K MP5 (CS:S)',
-    ],
-  },
-  {
-    category: 'Assault Rifles',
-    tags: ['M-16', 'Combat Rifle', 'AK-47', 'SIG SG552'],
-  },
-  {
-    category: 'Shotguns',
-    tags: [
-      'Pump Shotgun',
-      'Chrome Shotgun',
-      'Tactical Shotgun',
-      'Combat Shotgun',
-    ],
-  },
-  {
-    category: 'Snipers',
-    tags: ['Hunting Rifle', 'Military Rifle', 'Scout Rifle', 'AWP'],
-  },
-  {
-    category: 'Heavys',
-    tags: ['Grenade Launcher', 'M60', 'Mounted M60'],
-  },
-  {
-    category: 'Throwables',
-    tags: ['Molotov', 'Pipe Bomb', 'Boomer Bile'],
-  },
-  {
-    category: 'Weapon Upgrades',
-    tags: ['Laser Sight', 'Incendiary Ammo', 'Explosive Ammo'],
-  },
-  {
-    category: 'Usable Items',
-    tags: [
-      'Gas Can',
-      'Oxygen Tank',
-      'Fireworks',
-      'Explosive Barrel',
-      'Ammo Pile',
-    ],
-  },
-  {
-    category: 'Special Items',
-    tags: ['Cola', 'Gnome Chompski', 'Scavenge Gas Cans'],
-  },
-  {
-    category: 'Medical',
-    tags: ['Medkit', 'Defibrillator', 'Pills', 'Adrenaline'],
-  },
-  {
-    category: 'Animations',
-    tags: ['Healing', 'Reviving'],
-  },
-  {
-    category: 'Sounds',
-    tags: [
-      'Jukebox',
-      'Horde Incoming',
-      'Fall Sounds',
-      'Radial Character Voices',
-    ],
-  },
-  {
-    category: 'Music',
-    tags: [
-      'Concert Music',
-      'Saferoom Music',
-      'End Music',
-      'Death Music',
-      'Main Menu Music',
-      'Elevator Music',
-      'Tank Fight Music',
-    ],
-  },
-  {
-    category: 'Extras',
-    tags: [
-      'Particles',
-      'Graffiti',
-      'Flash Light',
-      'Moon',
-      'Helicopter',
-      'Jet',
-      'Blood',
-      'Car',
-      'Fire',
-      'Medical Cabinet',
-      'HUD',
-      'Main Menu Background',
-      'Saferoom Door',
-      'Grenade Launcher Grenade',
-      'Skybox',
-      'Billboards',
-      'Posters',
-      'Tank Rock',
-      'Pizza Boxes',
-      'Jimmys Car',
-      'TV',
-      'Ladders',
-      'Generators',
-      'Benches',
-      'Barriers',
-      'Tables',
-      'Flags',
-      'Potted Plant',
-      'Foliage',
-      'Water',
-      'Fence',
-    ],
-  },
-];
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api/db';
 
 const App = () => {
   const [mods, setMods] = useState([]);
@@ -266,6 +27,7 @@ const App = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(null);
 
   const [showImportPopup, setShowImportPopup] = useState(false);
   const [showAddToModpack, setShowAddToModpack] = useState(false);
@@ -275,6 +37,9 @@ const App = () => {
 
   // HMMM???
   const [originalCollection, setOriginalCollection] = useState([]);
+
+  // Toast notifications
+  const { showSuccess, showError, showWarning } = useToast();
 
   // useEffect(() => {
   //   const fetchMods = async () => {
@@ -308,29 +73,26 @@ const App = () => {
   const fetchMods = async () => {
     try {
       setLoading(true);
+      setError(null);
+
       const response = await fetch(
         `${API_URL}/mods?page=${page}&search=${searchTerm}&tag=${selectedTag}&sortBy=${sortBy}`
       );
-      const data = await response.json();
 
-      // TODO
-      if (data.error) {
-        return;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // TODO
-      // Something is wrong with prevMods I think. If we change around and go back to Most subscriptions,
-      // it's not showing the previous mods we initally had.
-      // if (page === 1 && false) {
-      //   setMods(data.mods);
-      //   setFilteredMods(data.mods);
-      // } else {
-      //   setMods((prevMods) => [...prevMods, ...data.mods]);
-      //   setFilteredMods((prevMods) => [...prevMods, ...data.mods]);
-      // }
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       const newMods = data.mods.filter(
         (newMod) => !mods.some((existingMod) => existingMod.id === newMod.id)
       );
+
       let modTemp = [];
       if (mods.length === 0) {
         modTemp = newMods;
@@ -343,10 +105,15 @@ const App = () => {
       }
 
       setHasMore(data.hasMore);
-
       filterAndSortMods(modTemp);
+
+      if (page === 1) {
+        showSuccess(`Loaded mods`);
+      }
     } catch (error) {
       console.error('Error fetching mod data:', error);
+      setError(error.message);
+      showError(`Failed to load mods: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -372,7 +139,6 @@ const App = () => {
     // If we're near the bottom (within 1000px), load more
     if (scrollOffset > filteredMods.length * 230 - 1000) {
       setPage((p) => p + 1);
-      console.error('Updating "page" ', page);
     }
   };
 
@@ -575,7 +341,6 @@ const App = () => {
   };
 
   const handleImportCollection = async (collection) => {
-    console.error('TEST2', collection);
     if (!collection.children || !Array.isArray(collection.children)) {
       console.error('Invalid collection format');
       return;
@@ -655,146 +420,172 @@ const App = () => {
   };
 
   return (
-    <div className="app">
-      <header className="app-header">
-        <img src="hand.png" alt="hand" height={100} width={100} />
-        <div>
-          <h1>Left 4 Dead 2 Mod Browser</h1>
-          <p className="header-desc">
-            Find and organize your favorite mods and collections
-          </p>
-        </div>
-      </header>
-
-      <div className="nav-container">
-        {view === 'modpack' ? (
-          <div></div>
-        ) : (
-          <div className="search-container">
-            <input
-              type="text"
-              id="search-input"
-              placeholder="Search mods..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <select
-              id="tag-select"
-              value={selectedTag}
-              onChange={(e) => updateSelectedTag(e.target)}
-            >
-              <option value="">All Tags</option>
-              {allTags.map((category) => (
-                <optgroup key={category.category} label={category.category}>
-                  {category.tags.map((tag) => (
-                    <option
-                      key={tag}
-                      value={tag}
-                      data-category={category.category}
-                    >
-                      {tag}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-            <select
-              id="sort-select"
-              value={sortBy}
-              onChange={(e) => handleSortChange(e.target.value)}
-            >
-              <option value="subscriptionsDesc">Most Subscriptions</option>
-              <option value="subscriptionsAsc">Least Subscriptions</option>
-              <option value="titleAsc">Title A-Z</option>
-              <option value="titleDesc">Title Z-A</option>
-              <option value="fileSize">File Size</option>
-            </select>
+    <ErrorBoundary>
+      <div className="app">
+        <header className="app-header">
+          <img src="hand.png" alt="hand" height={100} width={100} />
+          <div>
+            <h1>Left 4 Dead 2 Mod Browser</h1>
+            <p className="header-desc">
+              Find and organize your favorite mods and collections
+            </p>
           </div>
+        </header>
+
+        <div className="nav-container">
+          {view === 'modpack' ? (
+            <div></div>
+          ) : (
+            <div className="search-container">
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search mods..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <select
+                id="tag-select"
+                value={selectedTag}
+                onChange={(e) => updateSelectedTag(e.target)}
+              >
+                <option value="">All Tags</option>
+                {allTags.map((category) => (
+                  <optgroup key={category.category} label={category.category}>
+                    {category.tags.map((tag) => (
+                      <option
+                        key={tag}
+                        value={tag}
+                        data-category={category.category}
+                      >
+                        {tag}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+              <select
+                id="sort-select"
+                value={sortBy}
+                onChange={(e) => handleSortChange(e.target.value)}
+              >
+                <option value="subscriptionsDesc">Most Subscriptions</option>
+                <option value="subscriptionsAsc">Least Subscriptions</option>
+                <option value="titleAsc">Title A-Z</option>
+                <option value="titleDesc">Title Z-A</option>
+                <option value="fileSize">File Size</option>
+              </select>
+            </div>
+          )}
+
+          <nav>
+            {view === 'browser' ? (
+              'browser'
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        'Are you sure you want to remove all mods?'
+                      )
+                    ) {
+                      setModpack([]);
+                      setOriginalCollection([]);
+                    }
+                  }}
+                  className="remove-button"
+                >
+                  Remove All Mods
+                </button>
+                <button onClick={() => setShowImportPopup(true)}>
+                  Import Collection
+                </button>
+                <button onClick={() => setShowExportPopup(true)}>
+                  Export Collection
+                </button>
+              </>
+            )}
+            <button
+              onClick={() =>
+                setView(view === 'browser' ? 'modpack' : 'browser')
+              }
+            >
+              {view === 'browser' ? 'Manage Modpack' : 'Browse Mods'}
+            </button>
+          </nav>
+        </div>
+
+        {view === 'browser' ? (
+          <div id="mod-browser" className="view active">
+            {error && (
+              <div className="error-message">
+                <p>Error: {error}</p>
+                <button onClick={() => fetchMods()}>Retry</button>
+              </div>
+            )}
+            {loading && page === 1 ? (
+              <LoadingSpinner message="Loading mods..." />
+            ) : (
+              <>
+                <List
+                  height={900}
+                  itemCount={filteredMods.length}
+                  itemSize={230}
+                  width="100%"
+                  style={{ overflowX: 'hidden', borderRadius: '8px' }}
+                  onScroll={handleScroll}
+                >
+                  {ModCard}
+                </List>
+                {loading && page > 1 && (
+                  <div className="loading-more">
+                    <LoadingSpinner
+                      size="small"
+                      message="Loading more mods..."
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        ) : (
+          <ModpackCreator
+            mods={mods}
+            modpack={modpack}
+            removeFromModpack={removeFromModpack}
+            onTagSearch={handleTagSearch}
+            allTags={allTags}
+            onAdd={addToModpack}
+          />
         )}
 
-        <nav>
-          {view === 'browser' ? (
-            'browser'
-          ) : (
-            <>
-              <button
-                onClick={() => {
-                  if (
-                    window.confirm('Are you sure you want to remove all mods?')
-                  ) {
-                    setModpack([]);
-                    setOriginalCollection([]);
-                  }
-                }}
-                className="remove-button"
-              >
-                Remove All Mods
-              </button>
-              <button onClick={() => setShowImportPopup(true)}>
-                Import Collection
-              </button>
-              <button onClick={() => setShowExportPopup(true)}>
-                Export Collection
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => setView(view === 'browser' ? 'modpack' : 'browser')}
-          >
-            {view === 'browser' ? 'Manage Modpack' : 'Browse Mods'}
-          </button>
-        </nav>
+        {showAddToModpack && selectedMod && (
+          <AddToModpack
+            mod={selectedMod}
+            // allTags={allTags}
+            onClose={closeAddToModpackPopup}
+            onAdd={addToModpack}
+            highlightedTag={searchTerm}
+          />
+        )}
+        {showImportPopup && (
+          <ImportCollection
+            onImport={handleImportCollection}
+            onClose={() => setShowImportPopup(false)}
+          />
+        )}
+        {showExportPopup && (
+          <ExportCollection
+            modpack={modpack}
+            originalCollection={originalCollection}
+            onClose={() => setShowExportPopup(false)}
+          />
+        )}
+
+        <div className="footer"></div>
       </div>
-
-      {view === 'browser' ? (
-        <div id="mod-browser" className="view active">
-          <List
-            height={900}
-            itemCount={filteredMods.length}
-            itemSize={230}
-            width="100%"
-            style={{ overflowX: 'hidden', borderRadius: '8px' }}
-            onScroll={handleScroll}
-          >
-            {ModCard}
-          </List>
-        </div>
-      ) : (
-        <ModpackCreator
-          mods={mods}
-          modpack={modpack}
-          removeFromModpack={removeFromModpack}
-          onTagSearch={handleTagSearch}
-          allTags={allTags}
-          onAdd={addToModpack}
-        />
-      )}
-
-      {showAddToModpack && selectedMod && (
-        <AddToModpack
-          mod={selectedMod}
-          // allTags={allTags}
-          onClose={closeAddToModpackPopup}
-          onAdd={addToModpack}
-          highlightedTag={searchTerm}
-        />
-      )}
-      {showImportPopup && (
-        <ImportCollection
-          onImport={handleImportCollection}
-          onClose={() => setShowImportPopup(false)}
-        />
-      )}
-      {showExportPopup && (
-        <ExportCollection
-          modpack={modpack}
-          originalCollection={originalCollection}
-          onClose={() => setShowExportPopup(false)}
-        />
-      )}
-
-      <div className="footer"></div>
-    </div>
+    </ErrorBoundary>
   );
 };
 

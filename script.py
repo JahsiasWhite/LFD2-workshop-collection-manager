@@ -4,6 +4,9 @@ import json
 import argparse
 from datetime import datetime
 
+from dotenv import load_dotenv
+import os
+
 def get_workshop_items(app_id, api_key, single_request=False):
     base_url = "https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/"
     items = []
@@ -12,8 +15,6 @@ def get_workshop_items(app_id, api_key, single_request=False):
 
     while True:
     # for x in range(1):
-        if (api_key == ""):
-            break;
         
         params = {
             "key": api_key,
@@ -141,9 +142,15 @@ def main():
     args = parser.parse_args()
     
     # Usage
-    app_id = "550"  # Replace with the app ID of the game you're interested in
-    api_key = ""  # Replace with your Steam Web API key
+    load_dotenv() # Load environment variables from .env file
+    
+    app_id = "550"  # !REQUIRED Replace with the app ID of the game you're interested in
+    api_key = os.getenv("API_KEY")  # !REQUIRED Replace with your Steam Web API key
     creator_app_id = "" # This can be multiple??? So far I've seen: 550, 563
+
+    if api_key == "":
+        print("API key is required to fetch workshop items.")
+        return
 
     workshop_items = get_workshop_items(app_id, api_key)#, args.single)
     # workshop_items = query_single_item(api_key, 459208387)

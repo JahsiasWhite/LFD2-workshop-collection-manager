@@ -7,16 +7,16 @@ async function importJsonToDb() {
 
     // Read JSON files
     const data1 = JSON.parse(
-      await fs.readFile('./website/public/workshop_items1.json', 'utf8')
+      await fs.readFile('./website/public/workshop_items_10182025.json', 'utf8')
     );
-    const data2 = JSON.parse(
-      await fs.readFile('./website/public/workshop_items2.json', 'utf8')
-    );
+    // const data2 = JSON.parse(
+    //   await fs.readFile('./website/public/workshop_items2.json', 'utf8')
+    // );
 
     console.error('Combining Data...');
 
     // Combine and deduplicate data
-    const combinedData = [...data1, ...data2];
+    const combinedData = [...data1]; //, ...data2];
     const uniqueData = Array.from(
       new Map(combinedData.map((item) => [item.id, item])).values()
     );

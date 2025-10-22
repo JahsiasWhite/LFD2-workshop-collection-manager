@@ -10,27 +10,40 @@ const ImportCollection = ({ onImport, onClose }) => {
     setIsLoading(true);
     setError('');
 
-    const proxyUrl = `/ISteamRemoteStorage/GetCollectionDetails/v1/`;
+    // Use the backend proxy - the proxy in package.json will handle routing to the backend
+    const proxyUrl = '/api/steam/ISteamRemoteStorage/GetCollectionDetails/v1/';
     const formData = new FormData();
     formData.append('collectioncount', '1');
     formData.append('publishedfileids[0]', collectionId);
 
     try {
+      console.log('Fetching collection from:', proxyUrl);
       const response = await fetch(proxyUrl, {
         method: 'POST',
         body: formData,
       });
 
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch collection');
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+      
       const data = await response.json();
+      console.log('Collection data received:', data);
+
+      if (!data.response || !data.response.collectiondetails || data.response.collectiondetails.length === 0) {
+        throw new Error('No collection found with that ID');
+      }
 
       onImport(data.response.collectiondetails[0]);
       onClose();
     } catch (err) {
+      console.error('Import error:', err);
       setError(
-        'Failed to import collection. Please check your API key and collection ID.'
+        `Failed to import collection: ${err.message}. Please check your collection ID.`
       );
     } finally {
       setIsLoading(false);

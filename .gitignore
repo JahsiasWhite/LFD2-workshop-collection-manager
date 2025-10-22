@@ -5,6 +5,8 @@
 workshop_items.json
 workshop_items2.json
 
+workshop_items_*.json
+
 node_modules
 
 .env

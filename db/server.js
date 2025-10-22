@@ -29,7 +29,13 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const modsRouter = require('./routes/mods');
 
 const app = express();
-app.use(cors());
+
+// CORS configuration
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -46,8 +52,19 @@ app.use(
     pathRewrite: {
       '^/api/steam': '',
     },
+    onProxyReq: (proxyReq, req, res) => {
+      console.log('Proxying Steam API request:', req.method, req.url);
+    },
+    onError: (err, req, res) => {
+      console.error('Steam API proxy error:', err);
+    }
   })
 );
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // MongoDB routes - note the different base path
 app.use('/api/db', modsRouter);

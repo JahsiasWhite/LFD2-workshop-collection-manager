@@ -1,0 +1,247 @@
+// Shared tag definitions for LFD2 Mod Manager
+export const allTags = [
+  {
+    category: 'Survivors',
+    tags: [
+      'Survivors',
+      'Bill',
+      'Francis',
+      'Zoey',
+      'Louis',
+      'Coach',
+      'Ellis',
+      'Nick',
+      'Rochelle',
+    ],
+  },
+  {
+    category: 'Infected',
+    tags: [
+      'Common Infected',
+      'Special Infected',
+      'Hunter',
+      'Smoker',
+      'Boomer',
+      'Jockey',
+      'Spitter',
+      'Charger',
+      'Witch',
+      'Tank',
+    ],
+  },
+  {
+    category: 'Weapons',
+    tags: [
+      'Weapons',
+      'Shotgun',
+      'Grenade Launcher',
+      'Rifle',
+      'M60',
+      'Melee',
+      'SMG',
+      'Pistol',
+      'Sniper',
+      'Throwable',
+    ],
+  },
+  {
+    category: 'Medical',
+    tags: ['Medkit', 'Pills', 'Adrenaline', 'Defibrillator'],
+  },
+  {
+    category: 'Music',
+    tags: ['Sounds'],
+  },
+  {
+    category: 'Extras',
+    tags: ['Miscellaneous', 'Textures', 'Items', 'UI', 'Other', 'Models'],
+  },
+];
+
+export const customTags = [
+  {
+    category: 'Survivors',
+    tags: [
+      'Bill',
+      'Francis',
+      'Zoey',
+      'Louis',
+      'Coach',
+      'Ellis',
+      'Nick',
+      'Rochelle',
+    ],
+  },
+  {
+    category: 'Infected',
+    tags: [
+      'Common Infected',
+      'Riot Infected',
+      'Mud Men',
+      'Clown Infected',
+      'CEDA Worker Infected',
+      'Road Crew',
+      'Fallen Survivor',
+    ],
+  },
+  {
+    category: 'Special Infected',
+    tags: [
+      'Hunter',
+      'Smoker',
+      'Boomer',
+      'Jockey',
+      'Spitter',
+      'Charger',
+      'Witch',
+      'Tank',
+    ],
+  },
+  {
+    category: 'Melee Weapons',
+    tags: [
+      'Axe',
+      'Baseball Bat',
+      'Chainsaw',
+      'Cricket Bat',
+      'Crowbar',
+      'Frying Pan',
+      'Golf Club',
+      'Guitar',
+      'Katana',
+      'Machete',
+      'Tonfa',
+      'Shovel',
+      'Pitchfork',
+      'Combat Knife',
+    ],
+  },
+  {
+    category: 'Handguns',
+    tags: ['P220 Pistol', 'Glock 17', 'Magnum'],
+  },
+  {
+    category: 'SMGs',
+    tags: [
+      'Submachine Gun (UZI)',
+      'Silenced Submachine Gun (Mac-10)',
+      'H&K MP5 (CS:S)',
+    ],
+  },
+  {
+    category: 'Assault Rifles',
+    tags: ['M-16', 'Combat Rifle', 'AK-47', 'SIG SG552'],
+  },
+  {
+    category: 'Shotguns',
+    tags: [
+      'Pump Shotgun',
+      'Chrome Shotgun',
+      'Tactical Shotgun',
+      'Combat Shotgun',
+    ],
+  },
+  {
+    category: 'Snipers',
+    tags: ['Hunting Rifle', 'Military Rifle', 'Scout Rifle', 'AWP'],
+  },
+  {
+    category: 'Heavys',
+    tags: ['Grenade Launcher', 'M60', 'Mounted M60'],
+  },
+  {
+    category: 'Throwables',
+    tags: ['Molotov', 'Pipe Bomb', 'Boomer Bile'],
+  },
+  {
+    category: 'Weapon Upgrades',
+    tags: ['Laser Sight', 'Incendiary Ammo', 'Explosive Ammo'],
+  },
+  {
+    category: 'Usable Items',
+    tags: [
+      'Gas Can',
+      'Oxygen Tank',
+      'Fireworks',
+      'Explosive Barrel',
+      'Ammo Pile',
+    ],
+  },
+  {
+    category: 'Special Items',
+    tags: ['Cola', 'Gnome Chompski', 'Scavenge Gas Cans'],
+  },
+  {
+    category: 'Medical',
+    tags: ['Medkit', 'Defibrillator', 'Pills', 'Adrenaline'],
+  },
+  {
+    category: 'Animations',
+    tags: ['Healing', 'Reviving'],
+  },
+  {
+    category: 'Sounds',
+    tags: [
+      'Jukebox',
+      'Horde Incoming',
+      'Fall Sounds',
+      'Radial Character Voices',
+    ],
+  },
+  {
+    category: 'Music',
+    tags: [
+      'Concert Music',
+      'Saferoom Music',
+      'End Music',
+      'Death Music',
+      'Main Menu Music',
+      'Elevator Music',
+      'Tank Fight Music',
+    ],
+  },
+  {
+    category: 'Extras',
+    tags: [
+      'Particles',
+      'Graffiti',
+      'Flash Light',
+      'Moon',
+      'Helicopter',
+      'Jet',
+      'Blood',
+      'Car',
+      'Fire',
+      'Medical Cabinet',
+      'HUD',
+      'Main Menu Background',
+      'Saferoom Door',
+      'Grenade Launcher Grenade',
+      'Skybox',
+      'Billboards',
+      'Posters',
+      'Tank Rock',
+      'Pizza Boxes',
+      'Jimmys Car',
+      'TV',
+      'Ladders',
+      'Generators',
+      'Benches',
+      'Barriers',
+      'Tables',
+      'Flags',
+      'Potted Plant',
+      'Foliage',
+      'Water',
+      'Fence',
+    ],
+  },
+];
+
+// Mapping of special cases for tag variations
+export const tagVariations = {
+  'M-16': ['M16', 'M 16', 'M-16 Rifle', 'M16 Rifle'],
+  'CEDA Worker Infected': ['CEDA'],
+  'Mud Men': ['Mudmen'],
+  'Road Crew': ['Roadcrew'],
+};
