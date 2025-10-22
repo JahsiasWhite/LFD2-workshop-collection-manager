@@ -33,34 +33,6 @@ const TagCard = ({
     return normalizedText.includes(normalizedWord);
   };
 
-  // const modsWithTag = useMemo(() => {
-  //   if (count === 0) return [];
-
-  //   return modpack.filter((mod) => {
-  //     // Special case for Common Infected variants
-  //     if (category === 'Infected' && mod.tags.includes('Common Infected')) {
-  //       const normalizedTitle = normalizeText(mod.title);
-  //       if (hasCompleteWord(normalizedTitle, 'ceda')) {
-  //         if (!mod.addedTags.includes('ceda')) {
-  //           console.error('FIXING : ', mod);
-  //           // mod.addedTags = mod.addedTags.filter(
-  //           //   (tag) => tag !== 'Common Infected'
-  //           // ); // Removes 'Common Infected'
-  //           // mod.addedTags.push('CEDA Worker Infected');
-  //         }
-  //         return true;
-  //       }
-  //     }
-
-  //     // Check if it's already explicitly tagged
-  //     if (mod.addedTags.includes(tag)) return true;
-  //     return false;
-
-  //     // Generic title-based matching
-  //     // return hasCompleteWord(normalizedTitle, tag);
-  //   });
-  // }, [modpack, tag, category, count]);
-
   const previewImage = useMemo(() => {
     const modWithImage = modsWithTag.find((mod) => mod.preview_url);
     return modWithImage?.preview_url || '/art.jpg';

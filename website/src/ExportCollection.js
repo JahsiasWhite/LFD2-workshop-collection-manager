@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 
-import LazyImage from './LazyImage';
+import LazyImage from './components/LazyImage';
 
 const ExportCollection = ({ modpack, onClose, originalCollection }) => {
   // Compare current modpack with original collection to find added/removed mods

@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FixedSizeList as List } from 'react-window';
-// import AutoSizer from "react-virtualized-auto-sizer";
 import ModpackCreator from './ModpackCreator';
 import AddToModpack from './AddToModpack';
 import ImportCollection from './ImportCollection';
 import ExportCollection from './ExportCollection';
-import LazyImage from './LazyImage';
+import LazyImage from './components/LazyImage';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useToast } from './contexts/ToastContext';
@@ -15,60 +14,35 @@ import './App.css';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api/db';
 
 const App = () => {
+  // Data
   const [mods, setMods] = useState([]);
   const [filteredMods, setFilteredMods] = useState([]);
+  const [modpack, setModpack] = useState([]);
+  const [originalCollection, setOriginalCollection] = useState([]); // ? What is this exactly?
+
+  // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('subscriptionsDesc');
-  const [view, setView] = useState('browser');
-  const [modpack, setModpack] = useState([]);
   const [sizeFilter, setSizeFilter] = useState({ min: 0, max: Infinity });
+  const [sortBy, setSortBy] = useState('subscriptionsDesc');
+
+  // Status
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
 
+  // UI
+  const [view, setView] = useState('browser');
   const [showImportPopup, setShowImportPopup] = useState(false);
   const [showAddToModpack, setShowAddToModpack] = useState(false);
   const [showExportPopup, setShowExportPopup] = useState(false);
 
   const [selectedMod, setSelectedMod] = useState(null);
 
-  // HMMM???
-  const [originalCollection, setOriginalCollection] = useState([]);
-
   // Toast notifications
   const { showSuccess, showError, showWarning } = useToast();
-
-  // useEffect(() => {
-  //   const fetchMods = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const response = await fetch(
-  //         `http://localhost:3000/api/db/mods?page=${page}`
-  //       );
-  //       const data = await response.json();
-
-  //       if (page === 1) {
-  //         setMods(data.mods);
-  //         setFilteredMods(data.mods);
-  //       } else {
-  //         setMods((prevMods) => [...prevMods, ...data.mods]);
-  //         setFilteredMods((prevMods) => [...prevMods, ...data.mods]);
-  //       }
-
-  //       setHasMore(data.hasMore);
-  //       console.error('TOTAL NUMBER OF MODS: ', data.total);
-  //     } catch (error) {
-  //       console.error('Error fetching mod data:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchMods();
-  // }, [page]);
 
   const fetchMods = async () => {
     try {
@@ -100,10 +74,10 @@ const App = () => {
         filterAndSortMods(newMods);
       } else {
         // Subsequent pages - append to existing mods
+        // Don't re-sort on pagination, just append
         const updatedMods = [...mods, ...newMods];
         setMods(updatedMods);
         setFilteredMods(updatedMods);
-        // Don't re-sort on pagination, just append
       }
 
       setHasMore(data.hasMore);
@@ -180,46 +154,6 @@ const App = () => {
     setSelectedMod(null);
   };
 
-  // const filterAndSortMods = useCallback(() => {
-  //   let result = mods.filter((mod) => {
-  //     const titleMatch = mod.title
-  //       .toLowerCase()
-  //       .includes(searchTerm.toLowerCase());
-  //     const tagMatch = selectedTag === '' || mod.tags.includes(selectedTag);
-  //     const sizeMatch =
-  //       mod.file_size >= sizeFilter.min * 1024 * 1024 &&
-  //       mod.file_size <= sizeFilter.max * 1024 * 1024;
-
-  //     let categoryMatch = true;
-  //     if (selectedCategory !== '' && selectedCategory !== 'Extras') {
-  //       categoryMatch = mod.tags.length <= 6;
-  //     }
-
-  //     return titleMatch && tagMatch && sizeMatch && categoryMatch;
-  //   });
-
-  //   switch (sortBy) {
-  //     case 'subscriptionsDesc':
-  //       result.sort((a, b) => b.subscriptions - a.subscriptions);
-  //       break;
-  //     case 'subscriptionsAsc':
-  //       result.sort((a, b) => a.subscriptions - b.subscriptions);
-  //       break;
-  //     case 'titleAsc':
-  //       result.sort((a, b) => a.title.localeCompare(b.title));
-  //       break;
-  //     case 'titleDesc':
-  //       result.sort((a, b) => b.title.localeCompare(a.title));
-  //       break;
-  //     case 'fileSize':
-  //       result.sort((a, b) => b.file_size - a.file_size);
-  //       break;
-  //     default:
-  //       break;
-  //   }
-
-  //   setFilteredMods(result);
-  // }, [mods, searchTerm, selectedTag, sortBy, sizeFilter]);
   const filterAndSortMods = (mods) => {
     let result = mods.filter((mod) => {
       const titleMatch = mod.title
@@ -262,11 +196,6 @@ const App = () => {
 
     setFilteredMods(result);
   };
-
-  // TODO This infinetly runs???
-  // useEffect(() => {
-  //   filterAndSortMods();
-  // }, [filterAndSortMods]);
 
   const handleAddToModpackClick = (mod) => {
     setSelectedMod(mod);
@@ -381,7 +310,7 @@ const App = () => {
 
     console.log(`Added ${modsToAdd.length} mods to the modpack`);
 
-    // Optionally, you might want to update filteredMods here if needed
+    // maybe update filteredMods here?
     // filterAndSortMods();
   };
 

@@ -1,27 +1,3 @@
-// const express = require('express');
-// const { connectDB } = require('./config');
-// const modsRouter = require('./routes/mods');
-// const cors = require('cors');
-
-// const app = express();
-// app.use(cors());
-
-// async function startServer() {
-//   const db = await connectDB();
-//   app.locals.db = db;
-
-//   app.use(express.json());
-//   app.use(modsRouter);
-
-//   const PORT = process.env.PORT || 3000;
-//   app.listen(PORT, () => {
-//     console.log(`Server running on port ${PORT}`);
-//   });
-// }
-
-// startServer();
-
-// src/server.js
 const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./config');
@@ -31,10 +7,12 @@ const modsRouter = require('./routes/mods');
 const app = express();
 
 // CORS configuration
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
@@ -57,7 +35,7 @@ app.use(
     },
     onError: (err, req, res) => {
       console.error('Steam API proxy error:', err);
-    }
+    },
   })
 );
 
@@ -66,7 +44,7 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// MongoDB routes - note the different base path
+// MongoDB routes
 app.use('/api/db', modsRouter);
 
 async function startServer() {

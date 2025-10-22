@@ -1,9 +1,9 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
 
 import './ModpackCreator.css';
-import LazyImage from './LazyImage';
+import LazyImage from './components/LazyImage';
 
-import TagCard from './TagCard';
+import TagCard from './components/TagCard';
 import AddToModpack from './AddToModpack';
 import { allTags, tagVariations } from './constants/tags';
 

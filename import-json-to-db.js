@@ -20,7 +20,6 @@ async function importJsonToDb() {
     const uniqueData = Array.from(
       new Map(combinedData.map((item) => [item.id, item])).values()
     );
-    // const uniqueData = [combinedData[0]];
 
     console.error(
       'Combined Data. Total number of records: ',
@@ -28,7 +27,6 @@ async function importJsonToDb() {
     );
 
     // Insert data into MongoDB
-    // Using bulkWrite for better performance
     const operations = uniqueData.map((mod) => ({
       updateOne: {
         filter: { id: mod.id },
@@ -37,7 +35,7 @@ async function importJsonToDb() {
       },
     }));
 
-    console.error('Writing to db...');
+    console.log('Writing to db...');
 
     const result = await db.collection('mods').bulkWrite(operations);
     console.log('Data import completed successfully:', result);
