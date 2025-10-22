@@ -53,7 +53,7 @@ router.get('/mods', async (req, res) => {
     const mods = await db
       .collection('mods')
       .find(query)
-      // .sort(sortConfig)
+      .sort(sortConfig)
       .skip(skip)
       .limit(limit)
       .toArray();

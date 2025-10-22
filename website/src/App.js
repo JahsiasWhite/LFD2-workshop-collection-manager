@@ -93,23 +93,24 @@ const App = () => {
         (newMod) => !mods.some((existingMod) => existingMod.id === newMod.id)
       );
 
-      let modTemp = [];
-      if (mods.length === 0) {
-        modTemp = newMods;
+      if (page === 1) {
+        // First page - replace all mods
         setMods(newMods);
         setFilteredMods(newMods);
+        filterAndSortMods(newMods);
       } else {
-        modTemp = [...mods, ...newMods];
-        setMods((prevMods) => [...prevMods, ...newMods]);
-        setFilteredMods((prevMods) => [...prevMods, ...newMods]);
+        // Subsequent pages - append to existing mods
+        const updatedMods = [...mods, ...newMods];
+        setMods(updatedMods);
+        setFilteredMods(updatedMods);
+        // Don't re-sort on pagination, just append
       }
 
       setHasMore(data.hasMore);
-      filterAndSortMods(modTemp);
 
-      if (page === 1) {
-        showSuccess(`Loaded mods`);
-      }
+      // if (page === 1) {
+      //   showSuccess(`Loaded mods`);
+      // }
     } catch (error) {
       console.error('Error fetching mod data:', error);
       setError(error.message);
