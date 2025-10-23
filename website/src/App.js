@@ -336,6 +336,12 @@ const App = () => {
     const foundCategory = customTags.find((categoryObj) =>
       categoryObj.tags.includes(search)
     );
+
+    if (!foundCategory) {
+      console.error('Tag not found in any category');
+      return;
+    }
+
     console.error(foundCategory, foundCategory.category);
     if (foundCategory.category === 'Survivors') {
       setSelectedTag(search);

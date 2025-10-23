@@ -11,15 +11,16 @@ const ImportCollection = ({ onImport, onClose }) => {
     if (/^\d+$/.test(input.trim())) {
       return input.trim();
     }
-    
+
     // Try to extract ID from Steam URL
-    const urlPattern = /steamcommunity\.com\/sharedfiles\/filedetails\/\?id=(\d+)/;
+    const urlPattern =
+      /steamcommunity\.com\/sharedfiles\/filedetails\/\?id=(\d+)/;
     const match = input.match(urlPattern);
-    
+
     if (match) {
       return match[1];
     }
-    
+
     throw new Error('Invalid Steam collection URL or ID');
   };
 
@@ -30,9 +31,10 @@ const ImportCollection = ({ onImport, onClose }) => {
 
     try {
       const extractedId = extractCollectionId(collectionId);
-      
+
       // Use the backend proxy - the proxy in package.json will handle routing to the backend
-      const proxyUrl = '/api/steam/ISteamRemoteStorage/GetCollectionDetails/v1/';
+      const proxyUrl =
+        '/api/steam/ISteamRemoteStorage/GetCollectionDetails/v1/';
       const formData = new FormData();
       formData.append('collectioncount', '1');
       formData.append('publishedfileids[0]', extractedId);
@@ -44,17 +46,21 @@ const ImportCollection = ({ onImport, onClose }) => {
       });
 
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Response error:', errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log('Collection data received:', data);
 
-      if (!data.response || !data.response.collectiondetails || data.response.collectiondetails.length === 0) {
+      if (
+        !data.response ||
+        !data.response.collectiondetails ||
+        data.response.collectiondetails.length === 0
+      ) {
         throw new Error('No collection found with that ID');
       }
 
@@ -92,11 +98,14 @@ const ImportCollection = ({ onImport, onClose }) => {
               id="collectionId"
               value={collectionId}
               onChange={(e) => setCollectionId(e.target.value)}
-              placeholder="https://steamcommunity.com/sharedfiles/filedetails/?id=3140149743 or just 3140149743"
+              // placeholder="https://steamcommunity.com/sharedfiles/filedetails/?id=3140149743 or just 3140149743"
               required
             />
-            <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
-              You can paste the full Steam collection URL or just the collection ID
+            <small
+              style={{ display: 'block', marginTop: '5px', color: '#666' }}
+            >
+              You can paste the full Steam collection URL or just the collection
+              ID
             </small>
           </div>
           {error && <p className="error">{error}</p>}

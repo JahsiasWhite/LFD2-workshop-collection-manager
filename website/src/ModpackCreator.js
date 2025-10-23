@@ -4,7 +4,7 @@ import './ModpackCreator.css';
 
 import TagCard from './components/TagCard';
 import AddToModpack from './AddToModpack';
-import { allTags, tagVariations } from './constants/tags';
+import { customTags, tagVariations } from './constants/tags';
 
 const ModpackCreator = ({
   mods,
@@ -56,7 +56,7 @@ const ModpackCreator = ({
 
   useEffect(() => {
     const counts = {};
-    allTags.forEach((category) => {
+    customTags.forEach((category) => {
       category.tags.forEach((tag) => {
         // Count mods that have the exact tag
         const exactMatches = modpack.filter((mod) =>
@@ -144,7 +144,7 @@ const ModpackCreator = ({
         <p>Total mods: {modpack.length}</p>
         <p>
           Total moddable items:{' '}
-          {allTags.reduce((total, item) => total + item.tags.length, 0)}
+          {customTags.reduce((total, item) => total + item.tags.length, 0)}
         </p>
         <p>
           Total size:{' '}
@@ -234,7 +234,7 @@ const ModpackCreator = ({
 
       <div className="tag-stats">
         <h3>Tag Overview</h3>
-        {allTags.map((category) => (
+        {customTags.map((category) => (
           <div key={category.category} className="category-container">
             <h4>{category.category}</h4>
             <div className="tag-grid">

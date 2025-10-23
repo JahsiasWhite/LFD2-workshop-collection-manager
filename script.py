@@ -2,19 +2,19 @@ import requests
 import time
 import json
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 import os
 
 def get_workshop_items(app_id, api_key, single_request=False):
     base_url = "https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/"
+    cutoff_time = int((datetime.utcnow() - timedelta(days=1)).timestamp())  # 24 hours ago
     items = []
     cursor = "*"
     request_count = 0
 
     while True:
-    # for x in range(1):
         
         params = {
             "key": api_key,
@@ -36,7 +36,7 @@ def get_workshop_items(app_id, api_key, single_request=False):
             # "search_text": "",  # Example: "sword" - Search for items containing this text
             # "filetype": "",  # Example: "0" for Community item, "1" for Microtransaction item
             # "child_publishedfileid": "",  # Example: "1234567890" - Return only children of this item
-            # "days": "",  # Example: "7" - Only return items from the last 7 days
+            # "days": "1",  # ! Does not work! Example: "7" - Only return items from the last 7 days
             # "include_recent_votes_only": "",  # Example: "1" - Only use votes from the last 7 days
             # "required_kv_tags": "",  # Example: "{\"key\":\"value\"}" - Required key-value tags
             # "return_vote_data": "",  # Example: "1" - Return vote data for the items
@@ -51,8 +51,8 @@ def get_workshop_items(app_id, api_key, single_request=False):
             # "ids_only": ""  # Example: "1" - Return only the PublishedFileIDs of the items found
         }
         
-        # if (request_count == 2):
-        #     break
+        if (request_count == 2):
+            break
         
         response = requests.get(base_url, params=params)
         
@@ -65,6 +65,12 @@ def get_workshop_items(app_id, api_key, single_request=False):
             break
         
         for item in data["response"]["publishedfiledetails"]:
+            
+            # Only get items created within the last cutoff_time hours
+            created = int(item.get("time_created", 0))
+            if created < cutoff_time:
+                break
+            
             item_details = {
                 "id": item['publishedfileid'],
                 "title": item.get("title", "No Title"),
@@ -141,22 +147,26 @@ def main():
     parser.add_argument("--output", default="workshop_items3.json", help="Output JSON filename")
     args = parser.parse_args()
     
-    # Usage
     load_dotenv() # Load environment variables from .env file
     
     app_id = "550"  # !REQUIRED Replace with the app ID of the game you're interested in
-    api_key = os.getenv("API_KEY")
+    api_key = os.getenv("STEAM_API_KEY")
     creator_app_id = "" # This can be multiple??? So far I've seen: 550, 563
 
-    if api_key == "":
+    if not api_key:
         print("API key is required to fetch workshop items.")
         return
 
     workshop_items = get_workshop_items(app_id, api_key)#, args.single)
     # workshop_items = query_single_item(api_key, 459208387)
+    
+    if not workshop_items:
+        print("No items found.")
+        return
+    
     save_to_json(workshop_items, args.output)
 
-    print(f"Total items: {len(workshop_items)}")
+    print(f"Finished. Total items downloaded: {len(workshop_items)}")
 
 if __name__ == "__main__":
     main()

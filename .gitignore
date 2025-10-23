@@ -2,7 +2,7 @@
 .vscode
 
 # Test data
-workshop_items_*.json
+workshop_items*.json
 
 node_modules
 

@@ -4,6 +4,11 @@ A comprehensive tool for organizing and managing Left 4 Dead 2 mod collections w
 
 ## Project Structure
 
+The script.py is set to run every day. This downloads LFD2 workshop data from the last 24 hours. Once this is downloaded, import-json-to-db.js adds the new data to the database.
+
+`website/` runs the frontend React
+`db/` connects to the database and provides an API for the frontend with Node.js
+
 - **Backend** (`db/`): Node.js/Express API server with MongoDB
 - **Frontend** (`website/`): React application
 - **Scripts** (`script.py`): Python script for fetching Steam Workshop data
