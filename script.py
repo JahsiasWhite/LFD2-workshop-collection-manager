@@ -1,172 +1,192 @@
-import requests
-import time
-import json
-import argparse
-from datetime import datetime, timedelta
+#!/usr/bin/env python3
+"""
+Fetches recent workshop items and uploads them in a PostgreSQL database stored with Supabase.
+"""
 
-from dotenv import load_dotenv
 import os
+import time
+import argparse
+import logging
+import requests
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+from supabase import create_client, Client
 
-def get_workshop_items(app_id, api_key, single_request=False):
+
+# -------------------------------------------------------------------
+# Logging configuration
+# -------------------------------------------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+
+# -------------------------------------------------------------------
+# Database setup
+# -------------------------------------------------------------------
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("SUPABASE_URL and SUPABASE_KEY must be set in .env")
+
+# Initialize Supabase client
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+# -------------------------------------------------------------------
+# Steam Workshop API fetcher
+# -------------------------------------------------------------------
+def get_workshop_items(app_id: str, api_key: str, days: int = 1, single_request: bool = False):
+    """
+    Fetch Steam Workshop items created in the last `days`.
+    """
     base_url = "https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/"
-    cutoff_time = int((datetime.utcnow() - timedelta(days=1)).timestamp())  # 24 hours ago
+    cutoff_time = int((datetime.utcnow() - timedelta(days=days)).timestamp())
     items = []
     cursor = "*"
     request_count = 0
 
     while True:
-        
         params = {
             "key": api_key,
-            "query_type": 1, # 1 === k_PublishedFileQueryType_RankedByPublicationDate
-            "page": 1, # Start at the first page. Max of 1000
-            "numperpage": 100, # 100 Is max allowed by api :(
+            "query_type": 1,  # RankedByPublicationDate
+            "page": 1,
+            "numperpage": 100,
             "creator_appid": "563",
             "appid": app_id,
-            "return_metadata": 1, # When set to 1, it tells the API to return metadata about the items (like title, description, etc.)
-            "return_details": 1, # When set to 1, it requests additional details about the items
-            "cursor": cursor, # This is used for pagination. It's a string that tells the API where to start fetching results. The initial value "*" means start from the beginning. In subsequent requests, we use the "next_cursor" value from the previous response.
-            
-            # NOT SURE IF THESE WORK
-            "requiredtags": "",  # Example: "Weapon,Armor" - Items must have ALL these tags
-            # "excludedtags": "",  # Example: "NSFW,Mature" - Exclude items with ANY of these tags
-            "match_all_tags": "",  # Example: "1" - Match all tags in requiredtags (use with requiredtags)
-            # "required_flags": "",  # Example: "retreivable" - Items must have these flags
-            # "omitted_flags": "",  # Example: "hidden" - Exclude items with these flags
-            # "search_text": "",  # Example: "sword" - Search for items containing this text
-            # "filetype": "",  # Example: "0" for Community item, "1" for Microtransaction item
-            # "child_publishedfileid": "",  # Example: "1234567890" - Return only children of this item
-            # "days": "1",  # ! Does not work! Example: "7" - Only return items from the last 7 days
-            # "include_recent_votes_only": "",  # Example: "1" - Only use votes from the last 7 days
-            # "required_kv_tags": "",  # Example: "{\"key\":\"value\"}" - Required key-value tags
-            # "return_vote_data": "",  # Example: "1" - Return vote data for the items
-            "return_tags": "",  # Example: "1" - Return tag data for the items
-            # "return_kv_tags": "",  # Example: "1" - Return key-value tag data
-            # "return_previews": "",  # Example: "1" - Return preview image and video data
-            # "return_children": "",  # Example: "1" - Return child item ids
-            # "return_short_description": "",  # Example: "1" - Return short descriptions instead of full
-            # "return_for_sale_data": "",  # Example: "1" - Return pricing data, if applicable
-            # "return_playtime_stats": "",  # Example: "1" - Return playtime stats
-            # "strip_description_bbcode": "",  # Example: "1" - Strip BBCode from descriptions
-            # "ids_only": ""  # Example: "1" - Return only the PublishedFileIDs of the items found
+            "return_metadata": 1,
+            "return_details": 1,
+            "cursor": cursor,
+            "return_tags": 1,
         }
-        
-        if (request_count == 2):
-            break
-        
-        response = requests.get(base_url, params=params)
-        
+
         try:
+            response = requests.get(base_url, params=params, timeout=15)
+            response.raise_for_status()
             data = response.json()
-        except:
+        except requests.RequestException as e:
+            logging.error(f"Failed to fetch data: {e}")
             break
 
-        if "response" not in data or "publishedfiledetails" not in data["response"]:
+        details = data.get("response", {}).get("publishedfiledetails", [])
+        if not details:
             break
-        
-        for item in data["response"]["publishedfiledetails"]:
-            
-            # Only get items created within the last cutoff_time hours
+
+        stop_fetching = False
+        for item in details:
             created = int(item.get("time_created", 0))
             if created < cutoff_time:
+                if (created == 0):
+                    logging.warning(f"Item {item.get('publishedfileid')} has invalid creation time, skipping for now")
+                    continue
+                stop_fetching = True
                 break
-            
-            item_details = {
+
+            items.append({
                 "id": item['publishedfileid'],
                 "title": item.get("title", "No Title"),
                 "url": f"https://steamcommunity.com/sharedfiles/filedetails/?id={item['publishedfileid']}",
                 "description": item.get("file_description", ""),
-                "time_created": datetime.fromtimestamp(item.get("time_created", 0)).isoformat(),
+                "time_created": datetime.fromtimestamp(created).isoformat(),
                 "subscriptions": item.get("subscriptions", 0),
                 "favorited": item.get("favorited", 0),
-                "file_size": int(item.get("file_size", 0)) if str(item.get("file_size", 0)).isdigit() else 0, # Convert to float
+                "file_size": int(item.get("file_size", 0) or 0),
                 "preview_url": item.get("preview_url", ""),
                 "tags": [tag.get("tag", "") for tag in item.get("tags", [])],
                 "type": item.get("file_type", 0),
                 "creator": item.get("creator", ""),
                 "views": item.get("views", 0),
-            }
-            
-            # Determine if it's a texture mod 
-            # item_details["is_texture_mod"] = any("texture" in tag.lower() for tag in item_details["tags"])
-
-            items.append(item_details)
+            })
 
         request_count += 1
-        print(f"Fetched {len(items)} items so far...")
+        logging.info(f"Fetched {len(items)} items so far...")
 
-        if single_request or "next_cursor" not in data["response"] or data["response"]["next_cursor"] == cursor:
+        if single_request or stop_fetching or "next_cursor" not in data.get("response", {}):
             break
 
         cursor = data["response"]["next_cursor"]
-        time.sleep(1)  # To avoid hitting rate limits
+        if not cursor or cursor == "*":
+            break
+
+        time.sleep(.1)  # Respect API rate limits
 
     return items
 
-def query_single_item(api_key, publishedfileid):
-    base_url = "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/"
-    
-    data = {
-        "itemcount": 1,
-        "publishedfileids[0]": publishedfileid
-    }
-    
-    try:
-        response = requests.post(base_url, data=data)
-        response.raise_for_status()
+
+# -------------------------------------------------------------------
+# Save items to database
+# -------------------------------------------------------------------
+def save_to_supabase(items, batch_size=500):
+    if not items:
+        logging.info("No items to save.")
+        return
+
+    total = len(items)
+    inserted = 0
+    start_time = time.perf_counter()
+
+    logging.info(f"Starting bulk upsert of {total} items in batches of {batch_size}...")
+
+    for i in range(0, total, batch_size):
+        chunk = items[i:i + batch_size]
         
-        result = response.json()
-        
-        if 'response' in result and 'publishedfiledetails' in result['response']:
-            item_details = result['response']['publishedfiledetails'][0]
-            
-            if item_details.get('result') == 1:  # 1 means success
-                print(f"Successfully retrieved item {publishedfileid}")
-                return item_details
+        try:
+            response = supabase.table("workshop_items").upsert(
+                chunk,
+                on_conflict="id"
+            ).execute()
+
+            if response.data:
+                count = len(response.data)
+                inserted += count
+                logging.info(f"Batch batch_num: upserted {count} items ({inserted}/{total})")
             else:
-                print(f"Failed to retrieve item {publishedfileid}. Result: {item_details.get('result')}")
-                return None
-        else:
-            print("Unexpected response structure:", json.dumps(result, indent=2))
-            return None
-        
-    except requests.exceptions.RequestException as e:
-        print(f"Request failed: {e}")
-        return None
+                logging.warning(f"Batch batch_num: empty response (may already exist or skipped)")
 
-def save_to_json(items, filename):
-    with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(items, f, ensure_ascii=False, indent=4)
-    print(f"Results saved to {filename}")
 
+        except Exception as e:
+            logging.error(f"Batch {i//batch_size + 1} exception: {e}")
+
+        time.sleep(0.5)  # avoid rate limits
+
+    end_time = time.perf_counter()
+    logging.info(f"Finished inserting {inserted}/{total} items in {end_time - start_time:.2f}s.")
+
+# -------------------------------------------------------------------
+# Main
+# -------------------------------------------------------------------
 def main():
-    parser = argparse.ArgumentParser(description="Fetch Steam Workshop items")
-    # parser.add_argument("app_id", help="App ID of the game")
-    # parser.add_argument("api_key", help="Your Steam Web API key")
+    parser = argparse.ArgumentParser(description="Fetch Steam Workshop items and save to SQL")
     parser.add_argument("--single", action="store_true", help="Run only a single request")
-    parser.add_argument("--output", default="workshop_items3.json", help="Output JSON filename")
+    parser.add_argument("--days", type=int, default=2, help="Fetch items created in the last N days")
     args = parser.parse_args()
-    
-    load_dotenv() # Load environment variables from .env file
-    
-    app_id = "550"  # !REQUIRED Replace with the app ID of the game you're interested in
+
+    app_id = os.getenv("STEAM_APP_ID", "550")
     api_key = os.getenv("STEAM_API_KEY")
-    creator_app_id = "" # This can be multiple??? So far I've seen: 550, 563
 
     if not api_key:
-        print("API key is required to fetch workshop items.")
+        logging.error("STEAM_API_KEY environment variable is required.")
         return
 
-    workshop_items = get_workshop_items(app_id, api_key)#, args.single)
-    # workshop_items = query_single_item(api_key, 459208387)
-    
-    if not workshop_items:
-        print("No items found.")
-        return
-    
-    save_to_json(workshop_items, args.output)
+    start_time = time.perf_counter()  # start timer
+ 
+    logging.info(f"Fetching workshop items for app {app_id} from the last {args.days} day(s)...")
+    items = get_workshop_items(app_id, api_key, days=args.days, single_request=args.single)
 
-    print(f"Finished. Total items downloaded: {len(workshop_items)}")
+    if not items:
+        logging.info("No new items found.")
+        return
+
+    save_to_supabase(items)
+    
+    end_time = time.perf_counter()  # end timer
+    duration = end_time - start_time
+    logging.info(f"Finished. Total items fetched: {len(items)}")
+    logging.info(f"Total time taken: {duration:.2f} seconds")
+
 
 if __name__ == "__main__":
     main()

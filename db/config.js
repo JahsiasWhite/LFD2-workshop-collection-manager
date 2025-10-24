@@ -1,21 +1,24 @@
-const { MongoClient } = require('mongodb');
 require('dotenv').config();
+const { createClient } = require('@supabase/supabase-js');
 
-const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+// Load environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_KEY;
 
-let db;
+// Initialize the Supabase client
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { persistSession: false },
+});
 
 async function connectDB() {
   try {
-    await client.connect();
-    db = client.db();
-    console.log('Connected to MongoDB');
-    return db;
+    console.log('Supabase client initialized');
+    // No actual connection needed — just return the client
+    return supabase;
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    console.error('Supabase initialization error:', error.message);
     process.exit(1);
   }
 }
 
-module.exports = { connectDB, client };
+module.exports = { connectDB, supabase };

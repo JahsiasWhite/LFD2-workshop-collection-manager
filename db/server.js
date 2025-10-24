@@ -21,7 +21,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Steam API proxy setup (keep your existing proxy setup)
+// Steam API proxy setup
+// Used to import collections
 app.use(
   '/api/steam',
   createProxyMiddleware({
@@ -46,6 +47,8 @@ app.get('/api/health', (req, res) => {
 
 // MongoDB routes
 app.use('/api/db', modsRouter);
+// Pass supabase to routes that need it
+// app.use('/mods', modsRoutes(supabase));
 
 async function startServer() {
   const db = await connectDB();

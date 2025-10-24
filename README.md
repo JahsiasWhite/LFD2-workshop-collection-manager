@@ -2,23 +2,23 @@
 
 A comprehensive tool for organizing and managing Left 4 Dead 2 mod collections with an intuitive web interface.
 
-## Project Structure
+## Building
 
-The script.py is set to run every day. This downloads LFD2 workshop data from the last 24 hours. Once this is downloaded, import-json-to-db.js adds the new data to the database.
+### Project Structure
+
+The script.py is set to run every day. This downloads LFD2 workshop data from the last 48 hours. The script will upload the new data to the Supabase PostgreSQL database.
 
 `website/` runs the frontend React
 `db/` connects to the database and provides an API for the frontend with Node.js
 
-- **Backend** (`db/`): Node.js/Express API server with MongoDB
+- **Backend** (`db/`): Node.js API server with Supabase
 - **Frontend** (`website/`): React application
 - **Scripts** (`script.py`): Python script for fetching Steam Workshop data
-
-## Quick Start
 
 ### Prerequisites
 
 - Node.js (v16 or higher)
-- MongoDB
+- Supabase
 - Python 3.7+ (for data fetching)
 
 ### Installation
@@ -65,10 +65,9 @@ The script.py is set to run every day. This downloads LFD2 workshop data from th
 ### Root Level
 
 - `npm start` - Start backend server
-- `npm run start:dev` - Start both backend and frontend concurrently
 - `npm run build` - Build frontend for production
-- `npm run import` - Import JSON data to MongoDB
 - `npm run install:all` - Install all dependencies
+- `python script.py` - Installs and uploads workshop data into the database
 
 ### Backend (`db/`)
 
@@ -79,52 +78,3 @@ The script.py is set to run every day. This downloads LFD2 workshop data from th
 
 - `npm run start:frontend` - Start React development server
 - `npm run build:frontend` - Build for production
-
-## Development
-
-### Backend Development
-
-The backend is located in the `db/` directory and provides:
-
-- REST API endpoints for mod data
-- MongoDB integration
-- Steam API proxy
-- CORS configuration
-
-### Frontend Development
-
-The frontend is a React application in the `website/` directory featuring:
-
-- Modern React hooks and context
-- Virtualized scrolling for performance
-- Lazy loading images
-- Toast notifications
-- Error boundaries
-- Responsive design
-
-### Data Management
-
-- Use `script.py` to fetch latest mod data from Steam Workshop
-- Import data with `npm run import`
-- Data is stored in MongoDB with automatic deduplication
-
-## Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Database
-MONGODB_URI=mongodb://localhost:27017/lfd2-manager
-
-# API Configuration
-REACT_APP_API_URL=http://localhost:3000/api/db
-
-# Steam API (for script.py)
-STEAM_API_KEY=your_steam_api_key_here
-```
-
-## API Endpoints
-
-- `GET /api/db/mods` - Get paginated mod list
-- `POST /api/db/mods/batch` - Get mods by IDs
-- `GET /api/steam/*` - Proxy to Steam API

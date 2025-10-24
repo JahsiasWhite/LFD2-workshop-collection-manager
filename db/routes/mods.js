@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// In db/routes/mods.js
 router.get('/mods', async (req, res) => {
   try {
-    const db = req.app.locals.db;
+    const supabase = req.app.locals.db;
     const {
       page = 1,
       limit = 5,
@@ -13,93 +12,92 @@ router.get('/mods', async (req, res) => {
       sortBy = 'subscriptionsDesc',
     } = req.query;
 
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    // Build query based on search parameters
-    const query = {};
+    // Build base query
+    let query = supabase.from('workshop_items').select('*', { count: 'exact' });
+
     if (search) {
-      query.title = { $regex: search, $options: 'i' };
-    }
-    if (tag) {
-      query.tags = tag;
+      query = query.ilike('title', `%${search}%`);
     }
 
-    // Mods are always sorted
-    let sortConfig = {};
+    if (tag) {
+      query = query.contains('tags', [tag]); // assuming tags is a JSON array column
+    }
+
+    // Sorting
     switch (sortBy) {
-      case 'subscriptionsDesc':
-        sortConfig = { subscriptions: -1 };
-        break;
       case 'subscriptionsAsc':
-        sortConfig = { subscriptions: 1 };
+        query = query.order('subscriptions', { ascending: true });
+        break;
+      case 'subscriptionsDesc':
+        query = query.order('subscriptions', { ascending: false });
         break;
       case 'titleAsc':
-        sortConfig = { title: 1 };
+        query = query.order('title', { ascending: true });
         break;
       case 'titleDesc':
-        sortConfig = { title: -1 };
+        query = query.order('title', { ascending: false });
         break;
       case 'fileSize':
-        sortConfig = { file_size: -1 };
+        query = query.order('file_size', { ascending: false });
         break;
       default:
-        sortConfig = { subscriptions: -1 };
+        query = query.order('subscriptions', { ascending: false });
     }
 
-    // Get total count for pagination
-    const total = await db.collection('mods').countDocuments(query);
+    // Pagination
+    query = query.range(offset, offset + limit - 1);
 
-    console.error(sortConfig);
-    const mods = await db
-      .collection('mods')
-      .find(query)
-      .sort(sortConfig)
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+    const { data: mods, count: total, error } = await query;
+
+    if (error) {
+      console.error('Supabase query error:', error);
+      return res.status(500).json({ error: 'Failed to fetch mods' });
+    }
 
     res.json({
       mods,
       total,
-      hasMore: total > skip + mods.length,
+      hasMore: total > offset + mods.length,
     });
   } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Failed to fetch mods' });
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Add this new endpoint to your existing router
 router.post('/mods/batch', async (req, res) => {
   try {
-    const db = req.app.locals.db;
+    const supabase = req.app.locals.db;
     const { modIds } = req.body;
 
-    // Validate input
-    // if (!Array.isArray(modIds)) {
-    //   return res.status(400).json({ error: 'modIds must be an array' });
-    // }
-    // Validate input
     if (!modIds || typeof modIds[Symbol.iterator] !== 'function') {
       return res.status(400).json({ error: 'modIds must be iterable' });
     }
+
     const modIdsArray = Array.from(modIds).map((id) => id.toString());
     if (modIdsArray.length === 0) {
       return res.json({ mods: [], total: 0 });
     }
 
-    const mods = await db
-      .collection('mods')
-      .find({ id: { $in: modIdsArray } })
-      .toArray();
+    const { data: mods, error } = await supabase
+      .from('workshop_items')
+      .select('*')
+      .in('id', modIdsArray);
+
+    if (error) {
+      console.error('Supabase query error:', error);
+      return res.status(500).json({ error: 'Failed to fetch mods batch' });
+    }
 
     res.json({
       mods,
       total: mods.length,
     });
   } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Failed to fetch mods batch' });
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
