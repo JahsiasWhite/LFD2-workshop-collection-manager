@@ -45,10 +45,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// MongoDB routes
+// supabase routes
 app.use('/api/db', modsRouter);
-// Pass supabase to routes that need it
-// app.use('/mods', modsRoutes(supabase));
 
 async function startServer() {
   const db = await connectDB();

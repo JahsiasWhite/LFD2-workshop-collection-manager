@@ -13,7 +13,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 async function connectDB() {
   try {
     console.log('Supabase client initialized');
-    // No actual connection needed — just return the client
     return supabase;
   } catch (error) {
     console.error('Supabase initialization error:', error.message);

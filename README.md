@@ -34,9 +34,16 @@ The script.py is set to run every day. This downloads LFD2 workshop data from th
 2. **Set up environment variables:**
 
    ```bash
-   # Create .env file in root directory
-   MONGODB_URI=mongodb://localhost:27017/lfd2-manager
-   REACT_APP_API_URL=http://localhost:3000/api/db
+   # Supbase configuration
+   # Used by the backend to load the database and used by the script to upload data
+   SUPABASE_URL=
+   SUPABASE_KEY=
+
+   # For downloading the workshop data from Steam
+   STEAM_API_KEY=
+
+   # For the React frontend to connect to the backend API
+   API_URL=
    ```
 
 3. **Fetch mod data (optional):**
