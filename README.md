@@ -1,6 +1,6 @@
-# Left 4 Dead 2 Mod Manager
+# Left 4 Dead 2 Workshop Collection Manager
 
-A comprehensive tool for organizing and managing Left 4 Dead 2 mod collections with an intuitive web interface.
+A tool for organizing and managing Left 4 Dead 2 mod collections with an intuitive web interface.
 
 ## Building
 
@@ -26,7 +26,7 @@ The script.py is set to run every day. This downloads LFD2 workshop data from th
 1. **Clone and install dependencies:**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/JahsiasWhite/LFD2-workshop-collection-manager
    cd LFD2-manager
    npm run install:all
    ```

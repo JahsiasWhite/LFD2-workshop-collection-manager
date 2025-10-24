@@ -33,8 +33,8 @@ const ImportCollection = ({ onImport, onClose }) => {
       const extractedId = extractCollectionId(collectionId);
 
       // Use the backend proxy - the proxy in package.json will handle routing to the backend
-      const proxyUrl =
-        '/api/steam/ISteamRemoteStorage/GetCollectionDetails/v1/';
+      const baseUrl = 'https://lfd2-workshop-collection-manager.onrender.com'; // TODO: Move to env variable. Im just lazy right now
+      const proxyUrl = `${baseUrl}/api/steam/ISteamRemoteStorage/GetCollectionDetails/v1/`;
       const formData = new FormData();
       formData.append('collectioncount', '1');
       formData.append('publishedfileids[0]', extractedId);

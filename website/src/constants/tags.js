@@ -1,4 +1,3 @@
-// Shared tag definitions for LFD2 Mod Manager
 export const allTags = [
   {
     category: 'Survivors',
