@@ -361,7 +361,7 @@ const App = () => {
         <header className="app-header">
           <img src="hand.png" alt="hand" height={100} width={100} />
           <div>
-            <h1>Left 4 Dead 2 Mod Browser</h1>
+            <h1>Left 4 Dead 2 Collection Manager</h1>
             <p className="header-desc">
               Find and organize your favorite mods and collections
             </p>

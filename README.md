@@ -1,6 +1,8 @@
 # Left 4 Dead 2 Workshop Collection Manager
 
-A tool for organizing and managing Left 4 Dead 2 mod collections with an intuitive web interface.
+A tool for organizing and managing Left 4 Dead 2 mod collections on the Steam workshop, using an intuitive web interface. Most useful for seeing what types of mods are missing from your collection
+
+<img src="example.png" alt="Mod Maker Screenshot" />
 
 ## Building
 
