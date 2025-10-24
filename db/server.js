@@ -12,16 +12,14 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : [];
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.warn(`Blocked by CORS: ${origin}`);
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
-
-    // origin: function (origin, callback) {
-    //   // Allow requests with no origin (like curl or mobile apps)
-    //   if (!origin) return callback(null, true);
-    //   if (allowedOrigins.includes(origin)) return callback(null, true);
-    //   return callback(new Error('Not allowed by CORS'));
-    // },
-    // credentials: true,
   })
 );
 
