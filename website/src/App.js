@@ -111,6 +111,9 @@ const App = () => {
   const handleScroll = ({ scrollOffset, scrollUpdateWasRequested }) => {
     if (scrollUpdateWasRequested || loading || !hasMore) return;
 
+    // Only trigger infinite scroll if there is at least one mod loaded
+    if (filteredMods.length === 0) return;
+
     // If we're near the bottom (within 1000px), load more
     if (scrollOffset > filteredMods.length * 230 - 1000) {
       setPage((p) => p + 1);
