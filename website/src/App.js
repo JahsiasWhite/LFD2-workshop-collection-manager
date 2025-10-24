@@ -63,18 +63,19 @@ const App = () => {
         throw new Error(data.error);
       }
 
-      const newMods = data.mods.filter(
-        (newMod) => !mods.some((existingMod) => existingMod.id === newMod.id)
-      );
-
+      let newMods;
       if (page === 1) {
         // First page - replace all mods
+        newMods = data.mods;
         setMods(newMods);
         setFilteredMods(newMods);
         filterAndSortMods(newMods);
       } else {
         // Subsequent pages - append to existing mods
         // Don't re-sort on pagination, just append
+        newMods = data.mods.filter(
+          (newMod) => !mods.some((existingMod) => existingMod.id === newMod.id)
+        );
         const updatedMods = [...mods, ...newMods];
         setMods(updatedMods);
         setFilteredMods(updatedMods);
@@ -95,10 +96,14 @@ const App = () => {
   };
   useEffect(() => {
     fetchMods();
-  }, [page, searchTerm, selectedTag, sortBy]); // Add search dependencies
+  }, [page, sortBy]); // Add search dependencies
   // Reset page when search terms change
   useEffect(() => {
-    setPage(1);
+    if (page !== 1) {
+      setPage(1);
+    } else {
+      fetchMods();
+    }
   }, [searchTerm, selectedTag]);
   const handleSortChange = (newSortBy) => {
     setMods([]);
@@ -158,25 +163,25 @@ const App = () => {
   };
 
   const filterAndSortMods = (mods) => {
-    let result = mods.filter((mod) => {
-      const titleMatch = mod.title
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-      const tagMatch = selectedTag === '' || mod.tags.includes(selectedTag);
-      const sizeMatch =
-        mod.file_size >= sizeFilter.min * 1024 * 1024 &&
-        mod.file_size <= sizeFilter.max * 1024 * 1024;
+    // TODO: I should add some of this to the backend
+    // let result = mods.filter((mod) => {
+    //   const titleMatch = mod.title
+    //     .toLowerCase()
+    //     .includes(searchTerm.toLowerCase());
+    //   const tagMatch = selectedTag === '' || mod.tags.includes(selectedTag);
+    //   const sizeMatch =
+    //     mod.file_size >= sizeFilter.min * 1024 * 1024 &&
+    //     mod.file_size <= sizeFilter.max * 1024 * 1024;
 
-      let categoryMatch = true;
-      if (selectedCategory !== '' && selectedCategory !== 'Extras') {
-        categoryMatch = mod.tags.length <= 6;
-      }
+    //   let categoryMatch = true;
+    //   // if (selectedCategory !== '' && selectedCategory !== 'Extras') {
+    //   //   categoryMatch = mod.tags.length <= 6;
+    //   // }
 
-      return titleMatch && tagMatch && sizeMatch && categoryMatch;
-    });
+    //   return titleMatch && tagMatch && sizeMatch && categoryMatch;
+    // });
+    const result = mods;
 
-    // TODO: MAJOR GLITCH
-    // Basically, MongoDB sorts way different. EX: Emoji is end of Mongo list but start of our list
     switch (sortBy) {
       case 'subscriptionsDesc':
         result.sort((a, b) => b.subscriptions - a.subscriptions);
