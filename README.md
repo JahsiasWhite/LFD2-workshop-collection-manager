@@ -43,7 +43,7 @@ The script.py is set to run every day. This downloads LFD2 workshop data from th
    STEAM_API_KEY=
 
    # For the React frontend to connect to the backend API
-   API_URL=
+   REACT_APP_API_URL=
    ```
 
 3. **Fetch mod data (optional):**

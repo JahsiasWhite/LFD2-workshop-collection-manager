@@ -4,6 +4,7 @@
 # Test data
 workshop_items*.json
 
+build/
 node_modules
 
 .env

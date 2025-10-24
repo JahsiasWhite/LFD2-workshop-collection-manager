@@ -7,10 +7,21 @@ const modsRouter = require('./routes/mods');
 const app = express();
 
 // CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : [];
 app.use(
   cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: allowedOrigins,
     credentials: true,
+
+    // origin: function (origin, callback) {
+    //   // Allow requests with no origin (like curl or mobile apps)
+    //   if (!origin) return callback(null, true);
+    //   if (allowedOrigins.includes(origin)) return callback(null, true);
+    //   return callback(new Error('Not allowed by CORS'));
+    // },
+    // credentials: true,
   })
 );
 
