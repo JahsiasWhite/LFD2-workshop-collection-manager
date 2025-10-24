@@ -46,14 +46,12 @@ A tool for organizing and managing Left 4 Dead 2 mod collections on the Steam wo
    ALLOWED_ORIGINS=http://localhost:3001 # Assuming frontend is running locally on port 3001
    ```
 
-````
-
 3. **Fetch mod data (optional):**
 
-```bash
-# Run the Python script to fetch latest mod data and upload it into the database
-python script.py
-````
+   ```bash
+   # Run the Python script to fetch latest mod data and upload it into the database
+   python script.py
+   ```
 
 4. **Start the application:**
 
