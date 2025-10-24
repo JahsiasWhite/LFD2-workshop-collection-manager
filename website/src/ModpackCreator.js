@@ -228,7 +228,10 @@ const ModpackCreator = ({
             ))}
           </ul>
         ) : (
-          <p>No untagged mods in the modpack.</p>
+          <p>
+            No untagged mods in the modpack. These are mods from your imported
+            collection that weren't assigned to any tag/category.
+          </p>
         )}
       </div>
 

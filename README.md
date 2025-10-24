@@ -2,20 +2,15 @@
 
 A tool for organizing and managing Left 4 Dead 2 mod collections on the Steam workshop, using an intuitive web interface. Most useful for seeing what types of mods are missing from your collection
 
-<img src="example.png" alt="Mod Maker Screenshot" />
+<img src="example.png" alt="Workshop Collection Manager Screenshot" />
 
 ## Building
 
 ### Project Structure
 
-The script.py is set to run every day. This downloads LFD2 workshop data from the last 48 hours. The script will upload the new data to the Supabase PostgreSQL database.
-
-`website/` runs the frontend React
-`db/` connects to the database and provides an API for the frontend with Node.js
-
-- **Backend** (`db/`): Node.js API server with Supabase
-- **Frontend** (`website/`): React application
-- **Scripts** (`script.py`): Python script for fetching Steam Workshop data
+- **Scripts** (`script.py`): Runs daily to fetch new L4D2 Workshop data from the past 48 hours and upload it to the Supabase PostgreSQL database
+- **Frontend** (`website/`): Runs the frontend React application
+- **Backend** (`db/`): Node.js API server that connects to the Supabase database and exposes endpoints for the frontend
 
 ### Prerequisites
 
@@ -45,26 +40,24 @@ The script.py is set to run every day. This downloads LFD2 workshop data from th
    STEAM_API_KEY=
 
    # For the React frontend to connect to the backend API
-   REACT_APP_API_URL=
+   REACT_APP_API_URL=http://localhost:3000/api/db # Assuming backend is running locally on port 3000
+
+   # Used by the backend server to connect to the frontend
+   ALLOWED_ORIGINS=http://localhost:3001 # Assuming frontend is running locally on port 3001
    ```
+
+````
 
 3. **Fetch mod data (optional):**
 
-   ```bash
-   # Run the Python script to fetch latest mod data
-   python script.py
-
-   # Import data to database
-   npm run import
-   ```
+```bash
+# Run the Python script to fetch latest mod data and upload it into the database
+python script.py
+````
 
 4. **Start the application:**
 
    ```bash
-   # Start both backend and frontend
-   npm run start:dev
-
-   # Or start individually:
    npm run start:backend  # Backend only
    npm run start:frontend # Frontend only
    ```
