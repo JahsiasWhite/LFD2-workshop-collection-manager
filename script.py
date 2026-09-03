@@ -161,7 +161,7 @@ def save_to_supabase(items, batch_size=500):
 def main():
     parser = argparse.ArgumentParser(description="Fetch Steam Workshop items and save to SQL")
     parser.add_argument("--single", action="store_true", help="Run only a single request")
-    parser.add_argument("--days", type=int, default=2, help="Fetch items created in the last N days")
+    parser.add_argument("--days", type=int, default=4, help="Fetch items created in the last N days") # Last used 5/17/2026
     args = parser.parse_args()
 
     app_id = os.getenv("STEAM_APP_ID", "550")

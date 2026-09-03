@@ -23,11 +23,15 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="error-boundary">
-          <h2>Something went wrong.</h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <h2>Something went wrong</h2>
+          <p>The page hit an unexpected error. Reload to try again.</p>
+          <button type="button" onClick={() => window.location.reload()}>
+            Reload page
+          </button>
+          <details>
             {this.state.error && this.state.error.toString()}
             <br />
-            {this.state.errorInfo.componentStack}
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
           </details>
         </div>
       );

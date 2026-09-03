@@ -1,17 +1,11 @@
 export const allTags = [
   {
-    category: 'Survivors',
-    tags: [
-      'Survivors',
-      'Bill',
-      'Francis',
-      'Zoey',
-      'Louis',
-      'Coach',
-      'Ellis',
-      'Nick',
-      'Rochelle',
-    ],
+    category: 'Left 4 Dead 1 Survivors',
+    tags: ['Survivors', 'Bill', 'Francis', 'Zoey', 'Louis'],
+  },
+  {
+    category: 'Left 4 Dead 2 Survivors',
+    tags: ['Coach', 'Ellis', 'Nick', 'Rochelle'],
   },
   {
     category: 'Infected',
@@ -59,17 +53,12 @@ export const allTags = [
 
 export const customTags = [
   {
-    category: 'Survivors',
-    tags: [
-      'Bill',
-      'Francis',
-      'Zoey',
-      'Louis',
-      'Coach',
-      'Ellis',
-      'Nick',
-      'Rochelle',
-    ],
+    category: 'Left 4 Dead 1 Survivors',
+    tags: ['Bill', 'Francis', 'Zoey', 'Louis'],
+  },
+  {
+    category: 'Left 4 Dead 2 Survivors',
+    tags: ['Coach', 'Ellis', 'Nick', 'Rochelle'],
   },
   {
     category: 'Infected',
@@ -207,12 +196,15 @@ export const customTags = [
       'Flash Light',
       'Moon',
       'Helicopter',
+      'Helicopter Pilot',
       'Jet',
+      'Vending Machines',
       'Blood',
       'Car',
       'Fire',
       'Medical Cabinet',
       'HUD',
+      'Loading Spinner',
       'Main Menu Background',
       'Saferoom Door',
       'Grenade Launcher Grenade',
@@ -237,10 +229,56 @@ export const customTags = [
   },
 ];
 
-// Mapping of special cases for tag variations
+export const survivorCategories = new Set([
+  'Left 4 Dead 1 Survivors',
+  'Left 4 Dead 2 Survivors',
+]);
+
+// Workshop game-mode tags that indicate a custom map/campaign, not a content-replacement mod.
+export const workshopMapTags = new Set([
+  'Co-op',
+  'Campaigns',
+  'Versus',
+  'Scavenge',
+  'Survival',
+  'Realism',
+  'Mutations',
+]);
+
+// Alternate names only — the slot name itself always matches too (case-insensitive).
 export const tagVariations = {
   'M-16': ['M16', 'M 16', 'M-16 Rifle', 'M16 Rifle'],
   'CEDA Worker Infected': ['CEDA'],
   'Mud Men': ['Mudmen'],
   'Road Crew': ['Roadcrew'],
+  'Boomer Bile': ['boomer bile', 'bile jar', 'bile', 'vomit jar'],
+  'Pipe Bomb': ['pipebomb'],
+  Molotov: ['molotov', 'molotov cocktail'],
+  'Pump Shotgun': ['pump shotgun', 'pumpshotgun'],
+  'Tactical Shotgun': ['spas'],
+  'Combat Shotgun': ['auto shotgun'],
+  Magnum: ['magnum', 'magnum pistol', 'desert eagle', 'deagle'],
+  'Glock 17': ['glock'],
+  'P220 Pistol': ['p220', 'pistol'],
+  'Combat Knife': ['knife'],
+  'Skybox': ['skybox', 'skyboxes'],
+  'AK-47': ['ak47'],
+  'Frying Pan': ['pan'],
+  'Silenced Submachine Gun (Mac-10)': ['mac10', 'mac-10'],
+  'Loading Spinner': ['spinner'],
+  'Combat Rifle': ['scar-h'],
+  'Submachine Gun (UZI)': ['UZI'],
+};
+
+export const getTagVariations = (slot) => [slot, ...(tagVariations[slot] || [])];
+
+/** Short search query when browsing from a missing slot card. */
+export const getSlotSearchTerm = (slot) => {
+  const variations = tagVariations[slot];
+  if (variations?.length) return variations[0];
+
+  const parenMatch = slot.match(/\(([^)]+)\)/);
+  if (parenMatch) return parenMatch[1];
+
+  return slot;
 };

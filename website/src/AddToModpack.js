@@ -1,25 +1,43 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { customTags } from './constants/tags';
+import {
+  buildSlotOccupancyIndex,
+  categorizeSlots,
+} from './utils/slotMatching';
 
-let moddableItems = null;
+const AddToModpack = ({
+  mod,
+  modpack = [],
+  onClose,
+  onSave,
+  highlightedTag,
+}) => {
+  const isInModpack = useMemo(
+    () => modpack.some((entry) => entry.id === mod.id),
+    [modpack, mod.id]
+  );
 
-const AddToModpack = ({ mod, onClose, onAdd, allTags, highlightedTag }) => {
-  // const [selectedSlot, setSelectedSlot] = useState('');
-  const [selectedSlots, setSelectedSlots] = useState(mod.addedTags || []);
-  // moddableItems = allTags.flatMap((category) => category.tags);
-  moddableItems = customTags.flatMap((category) => category.tags);
+  const existingTags = useMemo(() => {
+    const inModpack = modpack.find((entry) => entry.id === mod.id);
+    return inModpack?.addedTags || mod.addedTags || [];
+  }, [modpack, mod]);
 
-  // TODO: This reruns a lot!
-  const compatibleSlots = [];
-  moddableItems = moddableItems.filter((item) => {
-    if (mod.tags.includes(item)) {
-      compatibleSlots.push(item);
-      return false; // Remove from moddableItems
-    }
-    return true; // Keep in moddableItems
-  });
+  const [selectedSlots, setSelectedSlots] = useState(existingTags);
 
-  // Scroll to highlighted tag when popup opens
+  useEffect(() => {
+    setSelectedSlots(existingTags);
+  }, [existingTags]);
+
+  const { suggested, categories } = useMemo(
+    () => categorizeSlots(mod, customTags),
+    [mod]
+  );
+
+  const slotOccupancy = useMemo(
+    () => buildSlotOccupancyIndex(modpack, mod.id),
+    [modpack, mod.id]
+  );
+
   const highlightedRef = useRef(null);
   useEffect(() => {
     if (highlightedTag && highlightedRef.current) {
@@ -32,14 +50,8 @@ const AddToModpack = ({ mod, onClose, onAdd, allTags, highlightedTag }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedSlots.length > 0) {
-      //   onAdd(mod, selectedSlot);
-      console.log('Adding ' + selectedSlots + ' mod to modpack', mod);
-      selectedSlots.forEach((slot) => onAdd(mod, slot));
-      onClose();
-    } else {
-      alert('Please select a slot.');
-    }
+    onSave(mod, selectedSlots);
+    onClose();
   };
 
   const handleSlotChange = (slot) => {
@@ -50,51 +62,148 @@ const AddToModpack = ({ mod, onClose, onAdd, allTags, highlightedTag }) => {
     );
   };
 
-  // Helper function to render a slot item
-  const renderSlotItem = (slot) => {
+  const handleSelectTaggedInCategory = (taggedSlots) => {
+    setSelectedSlots((prevSlots) => [...new Set([...prevSlots, ...taggedSlots])]);
+  };
+
+  const handleCategoryToggle = (categorySlots) => {
+    setSelectedSlots((prevSlots) => {
+      const allSelected = categorySlots.every((slot) => prevSlots.includes(slot));
+      if (allSelected) {
+        return prevSlots.filter((slot) => !categorySlots.includes(slot));
+      }
+      return [...new Set([...prevSlots, ...categorySlots])];
+    });
+  };
+
+  const setCategoryCheckboxRef = (categorySlots) => (element) => {
+    if (!element) return;
+    const selectedCount = categorySlots.filter((slot) =>
+      selectedSlots.includes(slot)
+    ).length;
+    element.indeterminate =
+      selectedCount > 0 && selectedCount < categorySlots.length;
+  };
+
+  const renderSlotItem = ({ slot, match }) => {
     const isHighlighted = slot === highlightedTag;
+    const isSuggested = Boolean(match);
+    const occupiedMods = slotOccupancy.get(slot) || [];
+    const isCurrentModInSlot = existingTags.includes(slot);
+
     return (
       <div
         key={slot}
         ref={isHighlighted ? highlightedRef : null}
-        className={`slot-item ${isHighlighted ? 'highlighted-slot' : ''}`}
+        className={[
+          'slot-item',
+          isHighlighted ? 'highlighted-slot' : '',
+          isSuggested ? 'suggested-slot' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
-        <input
-          type="checkbox"
-          id={slot}
-          name={slot}
-          value={slot}
-          checked={selectedSlots.includes(slot)}
-          onChange={() => handleSlotChange(slot)}
-        />
-        <label htmlFor={slot}>{slot}</label>
+        <label htmlFor={slot} className="slot-item-label">
+          <input
+            type="checkbox"
+            id={slot}
+            name={slot}
+            value={slot}
+            checked={selectedSlots.includes(slot)}
+            onChange={() => handleSlotChange(slot)}
+          />
+          <span className="slot-item-name">{slot}</span>
+          {match && <span className="slot-match-badge">({match.label})</span>}
+        </label>
+        {(occupiedMods.length > 0 || isCurrentModInSlot) && (
+          <div className="slot-occupancy">
+            {/* {isCurrentModInSlot && (
+              <span className="slot-occupancy-current">Already on this mod</span>
+            )} */}
+            {occupiedMods.map((occupiedMod) => (
+              <span key={occupiedMod.id} className="slot-occupancy-mod" title={occupiedMod.title}>
+                Taken by: {occupiedMod.title}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
 
   return (
     <div className="add-to-modpack-popup">
-      <div className="popup-content">
+      <div className="popup-content add-modpack-popup">
         <div className="modpack-slot-header">
-          <h2>Add {mod.title} to Modpack</h2>
+          <div className="modpack-slot-heading">
+            <h2>{isInModpack ? 'Edit Slots' : 'Add to Modpack'}</h2>
+            <p className="modpack-slot-mod-title">{mod.title}</p>
+          </div>
           <div className="popup-buttons">
-            <button type="submit" onClick={handleSubmit}>
-              Add
+            <button type="button" onClick={handleSubmit}>
+              Save
             </button>
             <button type="button" onClick={onClose}>
               Cancel
             </button>
           </div>
         </div>
-        {/* <p className="choose-slot">Choose a slot</p> */}
-        <form onSubmit={handleSubmit}>
-          <div>
-            <h3>Compatible Slots:</h3>
-            {compatibleSlots.map(renderSlotItem)}
-          </div>
-          <div>
-            <h3>Other Slots:</h3>
-            {moddableItems.map(renderSlotItem)}
+
+        <form className="slot-list-form" onSubmit={handleSubmit}>
+          <div className="slot-list-container">
+            {suggested.length > 0 && (
+              <section className="slot-category-section slot-suggested-section">
+                <h3>Suggested</h3>
+                <p className="slot-section-hint">
+                  Based on this mod&apos;s tags and title.
+                </p>
+                {suggested.map(renderSlotItem)}
+              </section>
+            )}
+
+            {categories.map(({ category, slots, allSlots, taggedSlots, matchesCategory }) => {
+              const unselectedTaggedCount = taggedSlots.filter(
+                (slot) => !selectedSlots.includes(slot)
+              ).length;
+              const allCategorySelected = allSlots.every((slot) =>
+                selectedSlots.includes(slot)
+              );
+
+              return (
+              <section key={category} className="slot-category-section">
+                <div className="slot-category-header">
+                  <label className="slot-category-label">
+                    <input
+                      type="checkbox"
+                      ref={setCategoryCheckboxRef(allSlots)}
+                      checked={allCategorySelected}
+                      onChange={() => handleCategoryToggle(allSlots)}
+                    />
+                    <span className="slot-category-name">{category}</span>
+                  </label>
+                  {taggedSlots.length > 1 && (
+                    <button
+                      type="button"
+                      className="slot-select-tagged-btn"
+                      onClick={() => handleSelectTaggedInCategory(taggedSlots)}
+                      disabled={unselectedTaggedCount === 0}
+                    >
+                      {unselectedTaggedCount === 0
+                        ? `All ${taggedSlots.length} tagged selected`
+                        : `Select all tagged (${taggedSlots.length})`}
+                    </button>
+                  )}
+                </div>
+                {matchesCategory && taggedSlots.length > 0 && (
+                  <p className="slot-section-hint">
+                    Workshop tags match {taggedSlots.length} slot
+                    {taggedSlots.length === 1 ? '' : 's'} in this category.
+                  </p>
+                )}
+                {slots.map(renderSlotItem)}
+              </section>
+              );
+            })}
           </div>
         </form>
       </div>

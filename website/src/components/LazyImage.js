@@ -26,15 +26,13 @@ const LazyImage = ({ src, alt, className }) => {
   }, [alt]);
 
   return (
-    <div id={`lazy-image-${alt}`} className={`relative ${className}`}>
-      {(!isInView || !isLoaded) && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
-      )}
+    <div id={`lazy-image-${alt}`} className={`lazy-image ${className || ''}`}>
+      {(!isInView || !isLoaded) && <div className="lazy-image-placeholder" />}
       {isInView && (
         <img
           src={src}
           alt={alt}
-          className={`${className} ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`${className || ''} ${isLoaded ? 'is-loaded' : 'is-loading'}`}
           onLoad={() => setIsLoaded(true)}
         />
       )}

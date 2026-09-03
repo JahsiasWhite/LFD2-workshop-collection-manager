@@ -11,7 +11,7 @@
 }
 
 .loading-medium {
-  padding: 20px;
+  padding: 28px 20px 8px;
 }
 
 .loading-large {
@@ -19,10 +19,10 @@
 }
 
 .spinner {
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #3498db;
+  border: 3px solid rgba(201, 162, 39, 0.2);
+  border-top: 3px solid var(--accent, #c9a227);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.9s linear infinite;
 }
 
 .loading-small .spinner {
@@ -32,24 +32,28 @@
 }
 
 .loading-medium .spinner {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
 .loading-large .spinner {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   border-width: 4px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-message {
-  margin-top: 10px;
-  color: #666;
+  margin-top: 12px;
+  color: var(--muted, #9b9a8c);
   font-size: 14px;
 }
 

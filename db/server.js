@@ -3,6 +3,7 @@ const cors = require('cors');
 const { connectDB } = require('./config');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const modsRouter = require('./routes/mods');
+const { loadSlotMatching } = require('./lib/slotMatching');
 
 const app = express();
 
@@ -49,9 +50,45 @@ app.use(
   })
 );
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+// Health check endpoint — pings Supabase so downtime is visible
+app.get('/api/health', async (req, res) => {
+  const supabase = req.app.locals.db;
+  if (!supabase) {
+    return res.status(503).json({
+      status: 'starting',
+      database: 'not_ready',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  try {
+    const { error } = await supabase
+      .from('workshop_items')
+      .select('id', { count: 'exact', head: true })
+      .limit(1);
+
+    if (error) {
+      console.error('Health check database error:', error);
+      return res.status(503).json({
+        status: 'degraded',
+        database: 'unavailable',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    res.json({
+      status: 'OK',
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'degraded',
+      database: 'unavailable',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // supabase routes
@@ -60,6 +97,7 @@ app.use('/api/db', modsRouter);
 async function startServer() {
   const db = await connectDB();
   app.locals.db = db;
+  await loadSlotMatching();
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

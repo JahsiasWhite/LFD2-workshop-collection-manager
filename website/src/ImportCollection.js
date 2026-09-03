@@ -64,7 +64,7 @@ const ImportCollection = ({ onImport, onClose }) => {
         throw new Error('No collection found with that ID');
       }
 
-      onImport(data.response.collectiondetails[0]);
+      onImport(data.response.collectiondetails[0], extractedId);
       onClose();
     } catch (err) {
       console.error('Import error:', err);
@@ -102,7 +102,7 @@ const ImportCollection = ({ onImport, onClose }) => {
               required
             />
             <small
-              style={{ display: 'block', marginTop: '5px', color: '#666' }}
+              style={{ display: 'block', marginTop: '5px', color: '#9b9a8c' }}
             >
               You can paste the full Steam collection URL or just the collection
               ID
