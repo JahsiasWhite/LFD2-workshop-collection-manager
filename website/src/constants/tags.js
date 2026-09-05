@@ -46,8 +46,20 @@ export const allTags = [
     tags: ['Sounds'],
   },
   {
+    category: 'Maps',
+    tags: ['Campaigns', 'Survival'],
+  },
+  {
     category: 'Extras',
-    tags: ['Miscellaneous', 'Textures', 'Items', 'UI', 'Other', 'Models'],
+    tags: [
+      'Single Player',
+      'Miscellaneous',
+      'Textures',
+      'Items',
+      'UI',
+      'Other',
+      'Models',
+    ],
   },
 ];
 
@@ -84,6 +96,10 @@ export const customTags = [
       'Witch',
       'Tank',
     ],
+  },
+  {
+    category: 'Maps',
+    tags: ['Campaigns', 'Survival'],
   },
   {
     category: 'Melee Weapons',
@@ -245,8 +261,12 @@ export const workshopMapTags = new Set([
   'Mutations',
 ]);
 
+// Browse "Hide maps" filter — campaign maps and survival maps.
+export const mapFilterTags = ['Campaigns', 'Survival'];
+
 // Alternate names only — the slot name itself always matches too (case-insensitive).
 export const tagVariations = {
+  Campaigns: ['Campaign'],
   'M-16': ['M16', 'M 16', 'M-16 Rifle', 'M16 Rifle'],
   'CEDA Worker Infected': ['CEDA'],
   'Mud Men': ['Mudmen'],
@@ -268,6 +288,13 @@ export const tagVariations = {
   'Loading Spinner': ['spinner'],
   'Combat Rifle': ['scar-h'],
   'Submachine Gun (UZI)': ['UZI'],
+  'Radial Character Voices': ['voices'],
+  'SIG SG552': ['sg552'],
+};
+
+/** Workshop tag applied when browsing from a missing slot card. */
+export const slotSearchTags = {
+  'Radial Character Voices': 'Sounds',
 };
 
 export const getTagVariations = (slot) => [slot, ...(tagVariations[slot] || [])];

@@ -13,6 +13,7 @@ import {
   allTags,
   customTags,
   getSlotSearchTerm,
+  slotSearchTags,
   survivorCategories,
 } from './constants/tags';
 import { getAutoAssignedSlots, modSuggestsMissingSlot } from './utils/slotMatching';
@@ -77,6 +78,7 @@ const App = () => {
   const [missingBrowseSlot, setMissingBrowseSlot] = useState('');
   const [highlightMissingSlots, setHighlightMissingSlots] = useState(true);
   const [filterMissingOnly, setFilterMissingOnly] = useState(false);
+  const [filterHideMaps, setFilterHideMaps] = useState(false);
   const [showBrowseFilters, setShowBrowseFilters] = useState(false);
   const browseFiltersRef = useRef(null);
 
@@ -170,9 +172,12 @@ const App = () => {
       ) {
         params.set('missingSlots', JSON.stringify(missingSlots));
       }
+      if (filterHideMaps) {
+        params.set('hideMaps', '1');
+      }
       return `${API_URL}/mods?${params}`;
     },
-    [debouncedSearch, selectedTag, sortBy, filterMissingOnly]
+    [debouncedSearch, selectedTag, sortBy, filterMissingOnly, filterHideMaps]
   );
 
   const fetchMods = useCallback(
@@ -696,7 +701,9 @@ const App = () => {
 
     setMissingBrowseSlot(filledSlots.has(search) ? '' : search);
 
-    if (foundCategory.category === 'Extras') {
+    if (slotSearchTags[search]) {
+      setSelectedTag(slotSearchTags[search]);
+    } else if (foundCategory.category === 'Extras') {
       setSelectedTag('Miscellaneous');
     } else if (survivorCategories.has(foundCategory.category)) {
       setSelectedTag(search);
@@ -726,7 +733,9 @@ const App = () => {
     filterMissingOnly && displayMods.length === 0 && filteredMods.length > 0;
   const awaitingFilteredResults = filterHidAllResults && hasMore;
   const activeBrowseFilterCount =
-    (highlightMissingSlots ? 1 : 0) + (filterMissingOnly ? 1 : 0);
+    (highlightMissingSlots ? 1 : 0) +
+    (filterMissingOnly ? 1 : 0) +
+    (filterHideMaps ? 1 : 0);
   const browseFiltersActive = activeBrowseFilterCount > 0;
 
   return (
@@ -878,6 +887,14 @@ const App = () => {
                         disabled={allSlotsFilled}
                       />
                       Missing slots only
+                    </label>
+                    <label className="browser-option">
+                      <input
+                        type="checkbox"
+                        checked={filterHideMaps}
+                        onChange={(e) => setFilterHideMaps(e.target.checked)}
+                      />
+                      Hide maps
                     </label>
                   </div>
                 )}

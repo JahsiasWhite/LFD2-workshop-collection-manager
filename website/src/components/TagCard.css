@@ -1,132 +1,230 @@
-/* Add these styles to ModpackCreator.css */
-
 .tag-card {
   position: relative;
   width: 100%;
-  height: 280px;
-  perspective: 1000px;
+  aspect-ratio: 4 / 5;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: var(--radius);
+  outline: none;
 }
 
-.tag-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
+.tag-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
-.tag-card.flipped .tag-card-inner {
-  transform: rotateY(180deg);
-}
-
-.tag-card-front,
-.tag-card-back {
+.tag-card-face {
   position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.tag-card:hover .tag-card-face {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.tag-card.has-tag:hover .tag-card-face {
+  border-color: var(--green);
+}
+
+.tag-card.missing-tag:hover .tag-card-face {
+  border-color: var(--danger);
+}
+
+.tag-card.is-expanded .tag-card-face {
+  border-color: var(--green);
+  box-shadow: inset 0 0 0 1px rgba(126, 168, 90, 0.35);
+}
+
+.tag-image-container,
+.tag-image-container .lazy-image,
+.tag-image-container img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  backface-visibility: hidden;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border, #2c3126);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-}
-
-.tag-card-back {
-  background-color: #1a1a1a;
-  color: white;
-  transform: rotateY(180deg);
-  overflow-y: auto;
-}
-
-.tag-card-back-content {
-  padding: 16px;
 }
 
 .tag-image-container {
-  height: 65%;
-  width: 100%;
   overflow: hidden;
-  background-color: #12140f;
+  background: #12140f;
 }
 
-.tag-image {
-  width: 100%;
-  height: 100%;
+.tag-image-container img {
   object-fit: cover;
+  transform: scale(1);
+  transition: transform 0.4s ease, filter 0.2s ease;
 }
 
-.tag-image.lazy-image {
-  display: block;
+.tag-card.has-tag:hover:not(.is-expanded) .tag-image-container img {
+  transform: scale(1.04);
+}
+
+.tag-card.missing-tag .tag-image-container img {
+  filter: saturate(0.55) brightness(0.72);
 }
 
 .tag-info {
   position: absolute;
-  height: 35%;
+  left: 0;
+  right: 0;
   bottom: 0;
-  width: 100%;
-  padding: 16px;
-  background-color: #1a1a1a;
-  color: white;
+  z-index: 1;
+  padding: 48px 12px 12px;
+  background: linear-gradient(
+    to top,
+    rgba(16, 17, 14, 0.96) 0%,
+    rgba(16, 17, 14, 0.78) 48%,
+    rgba(16, 17, 14, 0) 100%
+  );
 }
 
 .tag-info h4 {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.tag-info .status {
-  font-weight: 500;
+.tag-info-meta {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 6px;
+}
+
+.tag-info .status,
+.tag-info .count {
   margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .tag-info .status.added {
-  color: #4caf50;
+  color: var(--green-strong);
 }
 
 .tag-info .status.missing {
-  color: #f44336;
+  color: var(--danger);
 }
 
 .tag-info .count {
-  margin: 4px 0 0 0;
-  font-size: 0.9rem;
+  color: var(--muted);
 }
 
-.tag-card-back h5 {
-  margin: 0 0 12px 0;
-  font-size: 1.1rem;
+.tag-info .count-warn {
+  color: var(--accent);
 }
 
-.tag-card-back ul {
-  list-style-type: none;
+/* Detail sits as its own full-width grid row; the card stays a card */
+.tag-card-detail {
+  grid-column: 1 / -1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 10px;
+}
+
+.tag-card-detail ul {
+  list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.tag-card-back li {
-  padding: 4px 0;
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tag-card.missing-tag {
-  opacity: 0.7;
-}
-
-.tag-card.missing-tag:hover {
-  opacity: 0.9;
-}
-
-.mod-count {
   display: flex;
-  gap: 1em;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.warning-icon {
-  color: yellow;
+.tag-card-mod {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.tag-card-mod-thumb {
+  width: 72px;
+  height: 54px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.tag-card-mod-thumb.lazy-image,
+.tag-card-mod-thumb img {
+  width: 72px;
+  height: 54px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.tag-card-mod-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.tag-card-mod-info a,
+.tag-card-mod-info span {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.tag-card-mod-info a:hover,
+.tag-card-mod-info a:visited {
+  color: var(--accent);
+}
+
+.tag-card-mod-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tag-card-mod-actions button {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .tag-card-mod {
+    flex-wrap: wrap;
+  }
+
+  .tag-card-mod-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag-card-face,
+  .tag-image-container img {
+    transition: none;
+  }
+
+  .tag-card:hover .tag-card-face,
+  .tag-card.has-tag:hover:not(.is-expanded) .tag-image-container img {
+    transform: none;
+  }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 import './ModpackCreator.css';
 
-import TagCard from './components/TagCard';
+import { TagCardGrid } from './components/TagCard';
 import AddToModpack from './AddToModpack';
 import LazyImage from './components/LazyImage';
 import { customTags, getTagVariations, tagVariations } from './constants/tags';
@@ -323,22 +323,18 @@ const ModpackCreator = ({
         {customTags.map((category) => (
           <div key={category.category} className="category-container">
             <h4>{category.category}</h4>
-            <div className="tag-grid">
-              {category.tags.map((tag) => (
-                <TagCard
-                  key={tag}
-                  tag={tag}
-                  count={tagCounts[tag] || 0}
-                  category={category.category}
-                  modpack={modpack}
-                  onCardClick={handleCardClick}
-                  isExpanded={expandedCard === tag}
-                  onTagSearch={onTagSearch}
-                  removeFromModpack={removeFromModpack}
-                  editMod={editMod}
-                />
-              ))}
-            </div>
+            <TagCardGrid
+              tags={category.tags}
+              tagCounts={tagCounts}
+              modpack={modpack}
+              expandedCard={
+                category.tags.includes(expandedCard) ? expandedCard : null
+              }
+              onCardClick={handleCardClick}
+              onTagSearch={onTagSearch}
+              removeFromModpack={removeFromModpack}
+              editMod={editMod}
+            />
           </div>
         ))}
       </div>

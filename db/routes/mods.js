@@ -29,8 +29,16 @@ function sendDatabaseError(res, error) {
 const MOD_LIST_COLUMNS =
   'id, title, tags, subscriptions, file_size, preview_url, url';
 const MAX_PAGE_SIZE = 250;
+// Keep in sync with website/src/constants/tags.js mapFilterTags
+const MAP_FILTER_TAGS = ['Campaigns', 'Survival'];
 
-function buildModsQuery(supabase, { search, tag, sortBy }) {
+function isTruthyQuery(value) {
+  if (value == null || value === '') return false;
+  const normalized = String(value).toLowerCase();
+  return normalized !== '0' && normalized !== 'false' && normalized !== 'no';
+}
+
+function buildModsQuery(supabase, { search, tag, sortBy, hideMaps }) {
   let query = supabase.from('workshop_items').select(MOD_LIST_COLUMNS);
 
   if (search) {
@@ -39,6 +47,10 @@ function buildModsQuery(supabase, { search, tag, sortBy }) {
 
   if (tag) {
     query = query.contains('tags', [tag]);
+  }
+
+  if (hideMaps) {
+    query = query.not('tags', 'ov', `{${MAP_FILTER_TAGS.join(',')}}`);
   }
 
   switch (sortBy) {
@@ -74,6 +86,7 @@ router.get('/mods', async (req, res) => {
       search = '',
       tag = '',
       sortBy = 'subscriptionsDesc',
+      hideMaps = '',
       missingSlots: missingSlotsQuery = '',
     } = req.query;
 
@@ -86,8 +99,9 @@ router.get('/mods', async (req, res) => {
         : (pageNumber - 1) * pageSize;
 
     const missingSlots = parseMissingSlots(missingSlotsQuery);
+    const hideMapsOnly = isTruthyQuery(hideMaps);
     const buildQuery = () =>
-      buildModsQuery(supabase, { search, tag, sortBy });
+      buildModsQuery(supabase, { search, tag, sortBy, hideMaps: hideMapsOnly });
 
     if (missingSlots.length > 0) {
       const result = await fetchMatchedModsPage({

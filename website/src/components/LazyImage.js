@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const LazyImage = ({ src, alt, className }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const rootRef = useRef(null);
 
   useEffect(() => {
+    const imageElement = rootRef.current;
+    if (!imageElement) return undefined;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -15,18 +19,15 @@ const LazyImage = ({ src, alt, className }) => {
       { threshold: 0.1 }
     );
 
-    const imageElement = document.getElementById(`lazy-image-${alt}`);
-    if (imageElement) {
-      observer.observe(imageElement);
-    }
+    observer.observe(imageElement);
 
     return () => {
       observer.disconnect();
     };
-  }, [alt]);
+  }, []);
 
   return (
-    <div id={`lazy-image-${alt}`} className={`lazy-image ${className || ''}`}>
+    <div ref={rootRef} className={`lazy-image ${className || ''}`}>
       {(!isInView || !isLoaded) && <div className="lazy-image-placeholder" />}
       {isInView && (
         <img

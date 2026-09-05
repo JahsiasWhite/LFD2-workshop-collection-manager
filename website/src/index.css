@@ -237,7 +237,6 @@ button:disabled {
   position: absolute;
   top: -5px;
   right: -5px;
-  display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 16px;
@@ -248,7 +247,6 @@ button:disabled {
   color: #1a160c;
   font-size: 0.68rem;
   font-weight: 700;
-  line-height: 1;
 }
 
 .browser-filter-active-dot {
@@ -280,6 +278,10 @@ button:disabled {
   gap: 10px;
   width: 100%;
   line-height: 1.35;
+}
+
+.browser-filter-panel .browser-option + .browser-option {
+  margin-top: 8px;
 }
 
 .browser-filter-panel .browser-option input[type='checkbox'] {

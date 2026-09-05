@@ -246,8 +246,20 @@ const isStrongMatch = (mod, slot, match) => {
   return false;
 };
 
+const workshopMapTagsNormalized = new Set(
+  [...workshopMapTags].map((tag) => normalizeText(tag))
+);
+
 export const isMapMod = (mod) =>
-  (mod.tags || []).some((tag) => workshopMapTags.has(tag));
+  (mod.tags || []).some((tag) =>
+    workshopMapTagsNormalized.has(normalizeText(tag))
+  );
+
+const hasCampaignTag = (mod) =>
+  (mod.tags || []).some((tag) => {
+    const normalized = normalizeText(tag);
+    return normalized === 'campaigns' || normalized === 'campaign';
+  });
 
 export const matchesCategoryName = (mod, categoryName) => {
   const normalizedCategory = normalizeText(categoryName);
@@ -275,8 +287,15 @@ export const categorizeSlots = (mod, categories) => {
   const suggested = [];
   const suggestedSet = new Set();
   const byCategory = categories.map((category) => {
-    const categoryMatchesTitle = matchesCategoryName(mod, category.category);
-    const taggedSlots = getWorkshopTaggedSlots(mod, category.tags);
+    const categoryMatchesTitle =
+      matchesCategoryName(mod, category.category) ||
+      (category.category === 'Maps' && hasCampaignTag(mod));
+    let taggedSlots = getWorkshopTaggedSlots(mod, category.tags);
+    const suppressSurvivalTag =
+      category.category === 'Maps' && !hasCampaignTag(mod);
+    if (suppressSurvivalTag) {
+      taggedSlots = taggedSlots.filter((slot) => slot !== 'Survival');
+    }
 
     const suppressInfectedTitleHints =
       category.category === 'Special Infected' && isMapMod(mod);
@@ -284,10 +303,13 @@ export const categorizeSlots = (mod, categories) => {
     const slots = category.tags.map((slot) => {
       let match = getSlotMatch(mod, slot);
       if (
-        suppressInfectedTitleHints &&
-        match &&
-        (match.type === 'title' || match.type === 'parenthetical')
+        suppressSurvivalTag &&
+        slot === 'Survival' &&
+        match?.type === 'tag'
       ) {
+        match = null;
+      }
+      if (suppressInfectedTitleHints && match && match.type !== 'tag') {
         match = null;
       }
       return { slot, match };
